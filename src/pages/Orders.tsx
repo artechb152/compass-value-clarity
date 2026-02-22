@@ -1,58 +1,92 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ExternalLink, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { ExternalLink, AlertTriangle, CheckCircle, XCircle, ArrowRight } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const typeConfig: Record<string, { icon: React.ElementType; color: string; bgColor: string }> = {
-  legal: { icon: CheckCircle, color: "text-green-700", bgColor: "bg-green-50 border-green-200" },
-  illegal: { icon: AlertTriangle, color: "text-yellow-700", bgColor: "bg-yellow-50 border-yellow-200" },
-  manifestly_illegal: { icon: XCircle, color: "text-red-700", bgColor: "bg-red-50 border-red-200" },
+  legal: { icon: CheckCircle, color: "text-green-700", bgColor: "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800" },
+  illegal: { icon: AlertTriangle, color: "text-yellow-700 dark:text-yellow-400", bgColor: "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800" },
+  manifestly_illegal: { icon: XCircle, color: "text-red-700 dark:text-red-400", bgColor: "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800" },
 };
 
 const Orders = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Tables<"orders">[]>([]);
   const [selected, setSelected] = useState<Tables<"orders"> | null>(null);
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
+  const [viewedIds, setViewedIds] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.from("orders").select("*").then(({ data }) => data && setOrders(data));
     if (user) {
+      const stored = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
+      setViewedIds(stored);
       supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
     }
   }, [user]);
 
+  const openOrder = (o: Tables<"orders">) => {
+    setSelected(o);
+    setMiniChoice(null);
+    if (user && !viewedIds.includes(o.id)) {
+      const updated = [...viewedIds, o.id];
+      setViewedIds(updated);
+      localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updated));
+      if (updated.length >= orders.length && orders.length > 0) {
+        supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+      }
+    }
+  };
+
+  const progressPct = orders.length > 0 ? Math.round((viewedIds.length / orders.length) * 100) : 0;
+
   return (
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-primary mb-1">פקודות</h1>
-        <p className="text-muted-foreground text-sm mb-6">חוקית / בלתי חוקית / בלתי חוקית בעליל</p>
+        <div className="flex items-center gap-3 mb-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+            <ArrowRight className="h-5 w-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-primary">פקודות</h1>
+            <p className="text-muted-foreground text-sm">חוקית / בלתי חוקית / בלתי חוקית בעליל</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 mb-6">
+          <Progress value={progressPct} className="h-2 flex-1" />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{orders.length}</span>
+        </div>
 
         <div className="space-y-4">
           {orders.map((o) => {
             const cfg = typeConfig[o.type] || typeConfig.legal;
             const Icon = cfg.icon;
+            const isViewed = viewedIds.includes(o.id);
             return (
               <Card
                 key={o.id}
-                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border`}
-                onClick={() => { setSelected(o); setMiniChoice(null); }}
+                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isViewed ? "ring-2 ring-green-500/30" : ""}`}
+                onClick={() => openOrder(o)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === "Enter" && setSelected(o)}
+                onKeyDown={(e) => e.key === "Enter" && openOrder(o)}
               >
                 <CardHeader className="flex-row items-center gap-3">
                   <Icon className={`h-8 w-8 ${cfg.color}`} />
-                  <div>
+                  <div className="flex-1">
                     <CardTitle className="text-lg">{o.title_he}</CardTitle>
                     <p className="text-sm text-muted-foreground line-clamp-2">{o.official_definition_he?.slice(0, 80)}…</p>
                   </div>
+                  {isViewed && <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />}
                 </CardHeader>
               </Card>
             );
@@ -102,7 +136,6 @@ const Orders = () => {
                   </ol>
                 </div>
 
-                {/* Mini scenario */}
                 <div className="bg-accent/10 rounded-lg p-3">
                   <h3 className="font-semibold text-sm text-primary mb-2">🎯 מיני-תרחיש</h3>
                   <p className="text-sm mb-3">{selected.mini_scenario_he}</p>

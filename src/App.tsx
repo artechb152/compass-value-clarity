@@ -12,9 +12,7 @@ import Home from "./pages/Home";
 import Values from "./pages/Values";
 import Orders from "./pages/Orders";
 import Scenarios from "./pages/Scenarios";
-import Journal from "./pages/Journal";
 import Weekly from "./pages/Weekly";
-import SubmitDilemma from "./pages/SubmitDilemma";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -35,9 +33,7 @@ const App = () => (
             <Route path="/values" element={<ProtectedRoute><Values /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="/scenarios" element={<ProtectedRoute><Scenarios /></ProtectedRoute>} />
-            <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
             <Route path="/weekly" element={<ProtectedRoute><Weekly /></ProtectedRoute>} />
-            <Route path="/submit" element={<ProtectedRoute><SubmitDilemma /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
