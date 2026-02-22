@@ -51,7 +51,7 @@ const IntroVideo = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 to-background flex flex-col items-center p-4" dir="rtl">
       <div className="w-full max-w-2xl mt-8">
-        <h1 className="text-3xl font-bold text-primary text-center mb-1">🧭 רגע מצפן</h1>
+        <h1 className="text-3xl font-bold text-primary text-center mb-1">רגע רוח צה״ל</h1>
         <p className="text-center text-muted-foreground mb-6">לפני שמתחילים – 2 דקות על מה שמוביל אותנו</p>
 
         {/* Placeholder video */}

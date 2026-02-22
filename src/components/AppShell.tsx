@@ -1,7 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
-import { Home, BookOpen, Shield, FlaskConical, NotebookPen, MessageCircleQuestion, Upload, Settings, LogOut } from "lucide-react";
+import { Home, BookOpen, Shield, FlaskConical, NotebookPen, MessageCircleQuestion, Upload, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 
 const navItems = [
   { to: "/", icon: Home, label: "מסלול" },
@@ -16,15 +17,22 @@ const navItems = [
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { signOut, isAdmin } = useAuth();
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="min-h-screen flex flex-col" dir="rtl">
       {/* Header */}
       <header className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-md">
         <Link to="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold">🧭 מצפן</span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-lg font-bold">רוח צה״ל</span>
+            <span className="text-[10px] opacity-80">התנגשות בין ערכים</span>
+          </div>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="text-primary-foreground hover:bg-primary/80" aria-label="החלף מצב תצוגה">
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
           {isAdmin && (
             <Button variant="ghost" size="sm" asChild className="text-primary-foreground hover:bg-primary/80">
               <Link to="/admin"><Settings className="h-4 w-4" /></Link>

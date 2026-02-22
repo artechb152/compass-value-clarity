@@ -4,48 +4,60 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const { user } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [personalNumber, setPersonalNumber] = useState("");
+  const [courseName, setCourseName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup">("login");
 
   if (user) return <Navigate to="/" replace />;
 
-  const handleEmailPassword = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fullName.trim() || !personalNumber.trim() || !courseName.trim()) {
+      toast.error("יש למלא את כל השדות");
+      return;
+    }
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
-        if (error) throw error;
-        toast.success("נרשמת בהצלחה! בדוק/י את המייל לאימות.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+      // Use personal number as pseudo-email for Supabase Auth
+      const email = `${personalNumber.trim()}@ruach.local`;
+      const password = personalNumber.trim();
+
+      // Try sign in first
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (signInError) {
+        // If user doesn't exist, sign up
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullName.trim(), personal_number: personalNumber.trim(), course_name: courseName.trim() } },
+        });
+        if (signUpError) throw signUpError;
+
+        // Auto sign-in after signup
+        const { error: autoSignIn } = await supabase.auth.signInWithPassword({ email, password });
+        if (autoSignIn) throw autoSignIn;
+      }
+
+      // Upsert user_meta with profile info
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) {
+        await supabase.from("user_meta").upsert({
+          user_id: currentUser.id,
+          full_name: fullName.trim(),
+          personal_number: personalNumber.trim(),
+          course_name: courseName.trim(),
+        });
       }
     } catch (err: any) {
-      toast.error(err.message || "שגיאה בהתחברות");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleMagicLink = async () => {
-    if (!email) { toast.error("הכנס/י כתובת מייל"); return; }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
-      if (error) throw error;
-      toast.success("נשלח לינק למייל שלך!");
-    } catch (err: any) {
-      toast.error(err.message || "שגיאה בשליחה");
+      toast.error(err.message || "שגיאה בכניסה");
     } finally {
       setLoading(false);
     }
@@ -55,48 +67,27 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-primary/10 to-background" dir="rtl">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="text-5xl mb-2">🧭</div>
-          <CardTitle className="text-2xl">מצפן</CardTitle>
-          <CardDescription>התנגשות בין ערכים – קורס אינטראקטיבי</CardDescription>
+          <CardTitle className="text-2xl">רוח צה״ל</CardTitle>
+          <CardDescription>התנגשות בין ערכים</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={mode} onValueChange={(v) => setMode(v as "login" | "signup")}>
-            <TabsList className="w-full mb-4">
-              <TabsTrigger value="login" className="flex-1">כניסה</TabsTrigger>
-              <TabsTrigger value="signup" className="flex-1">הרשמה</TabsTrigger>
-            </TabsList>
-            <TabsContent value="login">
-              <form onSubmit={handleEmailPassword} className="space-y-4">
-                <div>
-                  <Label htmlFor="email">אימייל</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" dir="ltr" required />
-                </div>
-                <div>
-                  <Label htmlFor="password">סיסמה</Label>
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" dir="ltr" required />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>{loading ? "מתחבר/ת..." : "כניסה"}</Button>
-              </form>
-            </TabsContent>
-            <TabsContent value="signup">
-              <form onSubmit={handleEmailPassword} className="space-y-4">
-                <div>
-                  <Label htmlFor="email-signup">אימייל</Label>
-                  <Input id="email-signup" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" dir="ltr" required />
-                </div>
-                <div>
-                  <Label htmlFor="password-signup">סיסמה</Label>
-                  <Input id="password-signup" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="לפחות 6 תווים" dir="ltr" minLength={6} required />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>{loading ? "נרשם/ת..." : "הרשמה"}</Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-          <div className="mt-4 text-center">
-            <button onClick={handleMagicLink} disabled={loading} className="text-sm text-primary hover:underline">
-              שלחו לי לינק קסם למייל
-            </button>
-          </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <Label htmlFor="fullName">שם מלא</Label>
+              <Input id="fullName" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="ישראל ישראלי" required />
+            </div>
+            <div>
+              <Label htmlFor="personalNumber">מספר אישי</Label>
+              <Input id="personalNumber" type="text" value={personalNumber} onChange={(e) => setPersonalNumber(e.target.value)} placeholder="1234567" dir="ltr" required />
+            </div>
+            <div>
+              <Label htmlFor="courseName">שם קורס</Label>
+              <Input id="courseName" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} placeholder="קורס קצינים" required />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "נכנס/ת..." : "כניסה"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
