@@ -204,15 +204,24 @@ export type Database = {
       }
       user_meta: {
         Row: {
+          course_name: string | null
+          full_name: string | null
           intro_video_completed: boolean | null
+          personal_number: string | null
           user_id: string
         }
         Insert: {
+          course_name?: string | null
+          full_name?: string | null
           intro_video_completed?: boolean | null
+          personal_number?: string | null
           user_id: string
         }
         Update: {
+          course_name?: string | null
+          full_name?: string | null
           intro_video_completed?: boolean | null
+          personal_number?: string | null
           user_id?: string
         }
         Relationships: []

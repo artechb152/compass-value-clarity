@@ -55,7 +55,7 @@ const Home = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto space-y-6">
         <div className="text-center py-6">
-          <h1 className="text-3xl font-bold text-primary mb-1">🧭 מצפן</h1>
+          <h1 className="text-3xl font-bold text-primary mb-1">רוח צה״ל</h1>
           <p className="text-muted-foreground">התנגשות בין ערכים – המסלול שלך</p>
         </div>
 
