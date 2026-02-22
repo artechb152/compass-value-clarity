@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
@@ -7,12 +8,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+
+// Deterministic shuffle based on user id
+function seededShuffle<T>(arr: T[], seed: string): T[] {
+  const copy = [...arr];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  }
+  for (let i = copy.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash + i) | 0;
+    const j = Math.abs(hash) % (i + 1);
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+const SCENARIOS_PER_USER = 8;
 
 const Scenarios = () => {
   const { user } = useAuth();
-  const [scenarios, setScenarios] = useState<Tables<"scenarios">[]>([]);
+  const navigate = useNavigate();
+  const [allScenarios, setAllScenarios] = useState<Tables<"scenarios">[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
@@ -20,13 +41,25 @@ const Scenarios = () => {
   const [tensionDR, setTensionDR] = useState([50]);
   const [reflection, setReflection] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    supabase.from("scenarios").select("*").then(({ data }) => data && setScenarios(data));
+    supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
     if (user) {
       supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+      // Load completed scenario ids
+      supabase.from("responses").select("scenario_id").eq("user_id", user.id).then(({ data }) => {
+        if (data) setCompletedIds(new Set(data.map(r => r.scenario_id).filter(Boolean) as string[]));
+      });
     }
   }, [user]);
+
+  // Pick 8 scenarios deterministically per user
+  const scenarios = useMemo(() => {
+    if (!user || allScenarios.length === 0) return [];
+    const shuffled = seededShuffle(allScenarios, user.id);
+    return shuffled.slice(0, SCENARIOS_PER_USER);
+  }, [allScenarios, user]);
 
   const scenario = scenarios[currentIdx];
   if (!scenario) return <AppShell><div className="p-4 text-center text-muted-foreground">טוען תרחישים...</div></AppShell>;
@@ -50,8 +83,16 @@ const Scenarios = () => {
       tension_discipline_responsibility: tensionDR[0],
       reflection_text: reflection,
     });
+    setCompletedIds(prev => new Set([...prev, scenario.id]));
     setSubmitted(true);
     toast.success("התשובה נשמרה!");
+
+    // Check if all 8 completed
+    const newCompleted = new Set([...completedIds, scenario.id]);
+    const allDone = scenarios.every(s => newCompleted.has(s.id));
+    if (allDone) {
+      supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+    }
   };
 
   const goNext = () => {
@@ -70,12 +111,41 @@ const Scenarios = () => {
     setSubmitted(false);
   };
 
+  const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
+  const allDone = completedCount >= SCENARIOS_PER_USER;
+  const progressPct = Math.round((completedCount / SCENARIOS_PER_USER) * 100);
+
   return (
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-primary">מעבדת דילמות</h1>
+        <div className="flex items-center gap-3 mb-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+            <ArrowRight className="h-5 w-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-primary">מעבדת דילמות</h1>
+          </div>
           <span className="text-sm text-muted-foreground">{currentIdx + 1}/{scenarios.length}</span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="flex items-center gap-3 mb-4">
+          <Progress value={progressPct} className="h-2 flex-1" />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{completedCount}/{SCENARIOS_PER_USER}</span>
+        </div>
+
+        {/* Progress dots */}
+        <div className="flex gap-1.5 mb-4 justify-center">
+          {scenarios.map((s, i) => (
+            <button
+              key={s.id}
+              onClick={() => { setCurrentIdx(i); resetState(); }}
+              className={`w-3 h-3 rounded-full transition-all ${
+                i === currentIdx ? "bg-primary scale-125" : completedIds.has(s.id) ? "bg-green-500" : "bg-muted-foreground/30"
+              }`}
+              aria-label={`תרחיש ${i + 1}`}
+            />
+          ))}
         </div>
 
         <Card className="mb-4">
@@ -85,7 +155,7 @@ const Scenarios = () => {
           <CardContent>
             <p className="text-sm whitespace-pre-line leading-relaxed mb-4">{scenario.story_he}</p>
 
-            {chosenIdx === null && (
+            {chosenIdx === null && !completedIds.has(scenario.id) && (
               <>
                 <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר—איזה ערך פה מתנגש לך בראש?</p>
                 <div className="space-y-2">
@@ -98,15 +168,20 @@ const Scenarios = () => {
               </>
             )}
 
+            {completedIds.has(scenario.id) && chosenIdx === null && (
+              <div className="text-center py-4">
+                <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <p className="text-green-600 font-medium">תרחיש זה כבר הושלם ✓</p>
+              </div>
+            )}
+
             {chosenIdx !== null && !submitted && (
               <div className="space-y-5 mt-4">
-                {/* Feedback */}
                 <div className="bg-muted/50 rounded-lg p-3">
                   <p className="text-sm font-medium text-primary mb-1">אין פה שחור־לבן. בוא נפרק לערכים + השלכות.</p>
                   <p className="text-sm">{feedbacks[chosenIdx]}</p>
                 </div>
 
-                {/* Value selector */}
                 <div>
                   <p className="text-sm font-medium mb-2">בחר/י 2 ערכים שהתנגשו פה:</p>
                   <div className="flex flex-wrap gap-2">
@@ -123,7 +198,6 @@ const Scenarios = () => {
                   </div>
                 </div>
 
-                {/* Tension Meter */}
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-xs text-muted-foreground mb-1">
@@ -141,7 +215,6 @@ const Scenarios = () => {
                   </div>
                 </div>
 
-                {/* Reflection */}
                 <div>
                   <p className="text-sm font-medium mb-1">משפט אחד לעצמך—מה לקחת מזה?</p>
                   <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} />
@@ -156,6 +229,13 @@ const Scenarios = () => {
                 <p className="text-primary font-medium">✓ התשובה נשמרה</p>
                 {currentIdx < scenarios.length - 1 ? (
                   <Button onClick={goNext}>ממשיכים לתרחיש הבא →</Button>
+                ) : allDone ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">סיימת את כל התרחישים! 🎉</p>
+                    <Button onClick={() => navigate("/")} className="w-full" size="lg">
+                      🏁 סיום הקורס – חזרה למסך הראשי
+                    </Button>
+                  </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">סיימת את כל התרחישים! 🎉</p>
                 )}

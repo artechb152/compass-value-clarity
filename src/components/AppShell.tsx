@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
-import { Home, BookOpen, Shield, FlaskConical, NotebookPen, MessageCircleQuestion, Upload, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { Home, BookOpen, Shield, FlaskConical, MessageCircleQuestion, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
@@ -9,9 +9,7 @@ const navItems = [
   { to: "/values", icon: BookOpen, label: "ערכים" },
   { to: "/orders", icon: Shield, label: "פקודות" },
   { to: "/scenarios", icon: FlaskConical, label: "דילמות" },
-  { to: "/journal", icon: NotebookPen, label: "יומן" },
   { to: "/weekly", icon: MessageCircleQuestion, label: "שבועי" },
-  { to: "/submit", icon: Upload, label: "העלאה" },
 ];
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {

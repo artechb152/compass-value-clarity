@@ -3,14 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
-
-const TRANSCRIPT = `רוח צה"ל מגדירה את הערכים, העקרונות והנורמות שמנחים את הלוחמים והלוחמות בצה"ל.
-היא כוללת עשרה ערכים מרכזיים: דבקות במשימה, אחריות, אמינות, דוגמה אישית, חיי אדם, טוהר הנשק, מקצועיות, משמעת, רעות ושליחות.
-ערכים אלו עשויים להתנגש זה בזה – וכאן נכנס שיקול הדעת.
-הקורס הזה נועד לעזור לך לזהות את ההתנגשויות, לחשוב עליהן, ולפתח כלים להתמודדות.
-אין תשובות שחורות-לבנות. יש חשיבה, רפלקציה, ובחירה מודעת.`;
+import ruachImage from "@/assets/ruach-tzahal.png";
 
 const IntroVideo = () => {
   const { user } = useAuth();
@@ -43,7 +37,6 @@ const IntroVideo = () => {
     navigate("/", { replace: true });
   };
 
-  // Allow skip for placeholder since there's no real video
   const handleSkipPlaceholder = () => setCanProceed(true);
 
   if (checking) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
@@ -83,15 +76,24 @@ const IntroVideo = () => {
           </div>
         </div>
 
-        {/* Transcript */}
-        <Accordion type="single" collapsible className="bg-card rounded-xl shadow px-4 mb-6">
-          <AccordionItem value="transcript">
-            <AccordionTrigger>תמלול מלא</AccordionTrigger>
-            <AccordionContent>
-              <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/80">{TRANSCRIPT}</p>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        {/* What is Ruach Tzahal */}
+        <div className="bg-card rounded-xl shadow px-4 py-5 mb-6 space-y-4">
+          <h2 className="text-xl font-bold text-primary text-center">אז מה זה בעצם רוח צה״ל?</h2>
+          <p className="text-sm leading-relaxed text-foreground/80">
+            רוח צה״ל מגדירה את הערכים, העקרונות והנורמות שמנחים את הלוחמים והלוחמות בצה״ל.
+            היא כוללת עשרה ערכים מרכזיים: דבקות במשימה, אחריות, אמינות, דוגמה אישית, חיי אדם, טוהר הנשק, מקצועיות, משמעת, רעות ושליחות.
+          </p>
+          <p className="text-sm leading-relaxed text-foreground/80">
+            ערכים אלו עשויים להתנגש זה בזה – וכאן נכנס שיקול הדעת.
+            הקורס הזה נועד לעזור לך לזהות את ההתנגשויות, לחשוב עליהן, ולפתח כלים להתמודדות.
+            אין תשובות שחורות-לבנות. יש חשיבה, רפלקציה, ובחירה מודעת.
+          </p>
+          <img
+            src={ruachImage}
+            alt="מסמך רוח צה״ל המקורי – ערכי היסוד"
+            className="w-full rounded-lg shadow-md"
+          />
+        </div>
 
         <Button
           onClick={handleProceed}

@@ -5,48 +5,55 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Shield, FlaskConical, NotebookPen, MessageCircleQuestion, Upload } from "lucide-react";
+import { BookOpen, Shield, FlaskConical, MessageCircleQuestion } from "lucide-react";
 
 const modules = [
-  { key: "values", title: "רוח צה״ל – הערכים", icon: BookOpen, to: "/values", description: "10 ערכי יסוד של רוח צה״ל" },
-  { key: "orders", title: "פקודות", icon: Shield, to: "/orders", description: "חוקית / בלתי חוקית / בלתי חוקית בעליל" },
-  { key: "scenarios", title: "מעבדת דילמות", icon: FlaskConical, to: "/scenarios", description: "תרחישים אינטראקטיביים עם התנגשויות ערכיות" },
+  { key: "values", title: "רוח צה״ל – הערכים", icon: BookOpen, to: "/values", description: "10 ערכי יסוד של רוח צה״ל", total: 10 },
+  { key: "orders", title: "פקודות", icon: Shield, to: "/orders", description: "חוקית / בלתי חוקית / בלתי חוקית בעליל", total: 3 },
+  { key: "scenarios", title: "מעבדת דילמות", icon: FlaskConical, to: "/scenarios", description: "תרחישים אינטראקטיביים עם התנגשויות ערכיות", total: 8 },
 ];
-
-const statusLabel: Record<string, string> = {
-  not_started: "טרם התחיל",
-  in_progress: "בתהליך",
-  completed: "הושלם ✓",
-};
-
-const statusPct: Record<string, number> = {
-  not_started: 0,
-  in_progress: 50,
-  completed: 100,
-};
 
 const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [progressMap, setProgressMap] = useState<Record<string, string>>({});
+  const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
   const [checkingVideo, setCheckingVideo] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    // Check intro video
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (!data?.intro_video_completed) {
         navigate("/intro", { replace: true });
       }
       setCheckingVideo(false);
     });
-    // Load progress
-    supabase.from("progress").select("module_key, status").eq("user_id", user.id).then(({ data }) => {
-      const map: Record<string, string> = {};
-      data?.forEach((p) => { map[p.module_key] = p.status; });
+
+    // Load progress: count completed items per module from responses/progress
+    const loadProgress = async () => {
+      // Values: count distinct values opened (stored in progress detail or we track via localStorage approach)
+      // For now use progress table status
+      const { data: prog } = await supabase.from("progress").select("module_key, status").eq("user_id", user.id);
+      
+      // Count scenario responses
+      const { data: responses } = await supabase.from("responses").select("scenario_id").eq("user_id", user.id);
+      const scenarioCount = new Set(responses?.map(r => r.scenario_id)).size;
+
+      const map: Record<string, { completed: number; total: number }> = {
+        values: { completed: 0, total: 10 },
+        orders: { completed: 0, total: 3 },
+        scenarios: { completed: scenarioCount, total: 8 },
+      };
+
+      // Check values progress from localStorage
+      const viewedValues = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
+      map.values.completed = viewedValues.length;
+
+      const viewedOrders = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
+      map.orders.completed = viewedOrders.length;
+
       setProgressMap(map);
-    });
+    };
+    loadProgress();
   }, [user, navigate]);
 
   if (checkingVideo) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
@@ -59,13 +66,14 @@ const Home = () => {
           <p className="text-muted-foreground">התנגשות בין ערכים – המסלול שלך</p>
         </div>
 
-        {/* Modules */}
         <div className="space-y-4">
           {modules.map((mod, i) => {
-            const status = progressMap[mod.key] || "not_started";
+            const prog = progressMap[mod.key] || { completed: 0, total: mod.total };
+            const pct = Math.round((prog.completed / prog.total) * 100);
+            const label = prog.completed === 0 ? "בתהליך" : prog.completed >= prog.total ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
             return (
               <Link to={mod.to} key={mod.key}>
-                <Card className="hover:shadow-lg transition-shadow border-r-4 border-r-primary/30">
+                <Card className="hover:shadow-lg transition-shadow border-r-4 border-r-primary/30 mb-2">
                   <CardHeader className="pb-2 flex-row items-center gap-3">
                     <div className="bg-primary/10 p-2 rounded-lg">
                       <mod.icon className="h-6 w-6 text-primary" />
@@ -77,8 +85,8 @@ const Home = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-3">
-                      <Progress value={statusPct[status]} className="h-2 flex-1" />
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">{statusLabel[status]}</span>
+                      <Progress value={pct} className="h-2 flex-1" />
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">{label}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -88,23 +96,11 @@ const Home = () => {
         </div>
 
         {/* Quick Access */}
-        <div className="grid grid-cols-3 gap-3 pt-4">
-          <Link to="/journal">
-            <Card className="text-center p-3 hover:shadow transition-shadow">
-              <NotebookPen className="h-6 w-6 mx-auto text-primary mb-1" />
-              <span className="text-xs">יומן אישי</span>
-            </Card>
-          </Link>
+        <div className="flex justify-center pt-4">
           <Link to="/weekly">
             <Card className="text-center p-3 hover:shadow transition-shadow">
               <MessageCircleQuestion className="h-6 w-6 mx-auto text-primary mb-1" />
               <span className="text-xs">דילמת השבוע</span>
-            </Card>
-          </Link>
-          <Link to="/submit">
-            <Card className="text-center p-3 hover:shadow transition-shadow">
-              <Upload className="h-6 w-6 mx-auto text-primary mb-1" />
-              <span className="text-xs">העלאת דילמה</span>
             </Card>
           </Link>
         </div>
