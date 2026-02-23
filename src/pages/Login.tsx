@@ -23,6 +23,10 @@ const Login = () => {
       toast.error("יש למלא את כל השדות");
       return;
     }
+    if (!/^\d{9}$/.test(idNumber.trim())) {
+      toast.error("מספר תעודת זהות חייב להכיל 9 ספרות");
+      return;
+    }
     setLoading(true);
     try {
       const email = `${idNumber.trim()}@ruach.local`;
@@ -73,7 +77,7 @@ const Login = () => {
             </div>
             <div>
               <Label htmlFor="idNumber">מספר תעודת זהות</Label>
-              <Input id="idNumber" type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="123456789" dir="ltr" required />
+              <Input id="idNumber" type="text" inputMode="numeric" maxLength={9} value={idNumber} onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 9))} placeholder="123456789" dir="ltr" required />
             </div>
             <div>
               <Label htmlFor="courseName">שם קורס</Label>
