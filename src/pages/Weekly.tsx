@@ -8,6 +8,24 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import type { Tables, Json } from "@/integrations/supabase/types";
 
+// Get current ISO week key
+function getCurrentWeekKey(): string {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const days = Math.floor((now.getTime() - jan1.getTime()) / 86400000);
+  const week = Math.ceil((days + jan1.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+// Deterministic hash to pick a poll for a user+week combo
+function hashSeed(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
 const Weekly = () => {
   const { user } = useAuth();
   const [poll, setPoll] = useState<Tables<"weekly_polls"> | null>(null);
@@ -17,9 +35,16 @@ const Weekly = () => {
 
   useEffect(() => {
     const load = async () => {
-      const { data: polls } = await supabase.from("weekly_polls").select("*").order("created_at", { ascending: false }).limit(1);
-      if (!polls?.length) return;
-      const p = polls[0];
+      // Get all BANK polls
+      const { data: allPolls } = await supabase.from("weekly_polls").select("*");
+      if (!allPolls?.length) return;
+
+      const weekKey = getCurrentWeekKey();
+
+      // Pick a random poll per user per week using hash
+      const seed = `${user?.id || "anon"}-${weekKey}`;
+      const idx = hashSeed(seed) % allPolls.length;
+      const p = allPolls[idx];
       setPoll(p);
 
       if (user) {
@@ -27,7 +52,6 @@ const Weekly = () => {
         if (vote) { setVoted(true); setMyVote(vote.option_index); }
       }
 
-      // Get results
       const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: p.id });
       if (res) setResults(res as any);
     };
