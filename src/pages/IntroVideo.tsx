@@ -15,6 +15,17 @@ const IntroVideo = () => {
   const [checking, setChecking] = useState(true);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
+  // Check if user already completed intro
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      if (data?.intro_video_completed) {
+        navigate("/", { replace: true });
+      }
+      setChecking(false);
+    });
+  }, [user, navigate]);
+
   // Hide scroll hint when user scrolls near bottom
   useEffect(() => {
     if (checking) return;
