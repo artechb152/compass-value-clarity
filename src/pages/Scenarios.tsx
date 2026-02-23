@@ -51,7 +51,10 @@ const Scenarios = () => {
       supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
       // Load completed scenario ids
       supabase.from("responses").select("scenario_id").eq("user_id", user.id).then(({ data }) => {
-        if (data) setCompletedIds(new Set(data.map(r => r.scenario_id).filter(Boolean) as string[]));
+        if (data) {
+          const completed = new Set(data.map(r => r.scenario_id).filter(Boolean) as string[]);
+          setCompletedIds(completed);
+        }
       });
     }
   }, [user]);
@@ -62,6 +65,15 @@ const Scenarios = () => {
     const shuffled = seededShuffle(allScenarios, user.id);
     return shuffled.slice(0, SCENARIOS_PER_USER);
   }, [allScenarios, user]);
+
+  // Auto-advance to first incomplete scenario on load
+  useEffect(() => {
+    if (scenarios.length === 0 || completedIds.size === 0) return;
+    const firstIncomplete = scenarios.findIndex(s => !completedIds.has(s.id));
+    if (firstIncomplete > 0) {
+      setCurrentIdx(firstIncomplete);
+    }
+  }, [scenarios, completedIds]);
 
   const scenario = scenarios[currentIdx];
   if (!scenario) return <AppShell><div className="p-4 text-center text-muted-foreground">טוען תרחישים...</div></AppShell>;
@@ -135,20 +147,6 @@ const Scenarios = () => {
         <div className="flex items-center gap-3 mb-4">
           <Progress value={progressPct} className="h-2 flex-1" />
           <span className="text-xs text-muted-foreground whitespace-nowrap">{completedCount}/{SCENARIOS_PER_USER}</span>
-        </div>
-
-        {/* Progress dots */}
-        <div className="flex gap-1.5 mb-4 justify-center">
-          {scenarios.map((s, i) => (
-            <button
-              key={s.id}
-              onClick={() => { setCurrentIdx(i); resetState(); }}
-              className={`w-3 h-3 rounded-full transition-all ${
-                i === currentIdx ? "bg-primary scale-125" : completedIds.has(s.id) ? "bg-green-500" : "bg-muted-foreground/30"
-              }`}
-              aria-label={`תרחיש ${i + 1}`}
-            />
-          ))}
         </div>
 
         <Card className="mb-4">
