@@ -6,7 +6,6 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ExternalLink, ArrowRight, CheckCircle } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
@@ -102,14 +101,14 @@ const Values = () => {
         <DialogContent className="max-w-lg h-[80vh] overflow-y-auto" dir="rtl">
           {selected && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-xl">{selected.title_he}</DialogTitle>
-                <DialogDescription>ערך מתוך רוח צה״ל</DialogDescription>
+              <DialogHeader className="text-right">
+                <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
+                <DialogDescription className="text-right">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-sm text-primary mb-1">ההגדרה הרשמית</h3>
+                  <h3 className="font-semibold text-sm text-primary mb-1 text-right">ההגדרה הרשמית</h3>
                   <p className="text-sm leading-relaxed">{selected.official_definition_he}</p>
                   {selected.source_url && (
                     <a href={selected.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
@@ -119,30 +118,8 @@ const Values = () => {
                 </div>
 
                 <div className="bg-muted/50 rounded-lg p-3">
-                  <h3 className="font-semibold text-sm text-primary mb-1">💬 מה זה אומר בפועל?</h3>
+                  <h3 className="font-semibold text-sm text-primary mb-1 text-right">💬 מה זה אומר בפועל?</h3>
                   <p className="text-sm">{selected.youth_microcopy_he}</p>
-                </div>
-
-                <div className="bg-accent/10 rounded-lg p-3">
-                  <h3 className="font-semibold text-sm text-primary mb-1">⚡ תרגול זריז</h3>
-                  <p className="text-sm mb-3">{selected.quick_exercise_question_he}</p>
-
-                  <p className="text-xs font-medium text-primary mb-2">👆 לחצ/י על 2 ערכים שלדעתך מתנגשים כאן:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {values.filter((v) => v.id !== selected.id).map((v) => (
-                      <Badge
-                        key={v.id}
-                        variant={selectedConflicts.includes(v.title_he) ? "default" : "outline"}
-                        className="cursor-pointer text-sm py-1 px-3"
-                        onClick={() => toggleConflict(v.title_he)}
-                      >
-                        {v.title_he}
-                      </Badge>
-                    ))}
-                  </div>
-                  {selectedConflicts.length === 2 && (
-                    <p className="text-xs text-green-600 mt-2">✓ בחרת: {selectedConflicts.join(" ↔ ")}</p>
-                  )}
                 </div>
 
                 {selected.example_safe_he && (
@@ -151,8 +128,6 @@ const Values = () => {
                   </div>
                 )}
               </div>
-
-              <Button onClick={() => setSelected(null)} className="w-full mt-2">סגור</Button>
             </>
           )}
         </DialogContent>
