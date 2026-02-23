@@ -10,32 +10,26 @@ const IntroVideo = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
   const [progress, setProgress] = useState(0);
   const [canProceed, setCanProceed] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [showScrollHint, setShowScrollHint] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(true);
 
-  useEffect(() => {
-    if (!user) return;
-    supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-      if (data?.intro_video_completed) {
-        navigate("/", { replace: true });
-      }
-      setChecking(false);
-    });
-  }, [user, navigate]);
-
+  // Hide scroll hint when user scrolls near bottom
   useEffect(() => {
     if (checking) return;
-    const el = imgRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowScrollHint(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      if (docHeight - scrollBottom < 100) {
+        setShowScrollHint(false);
+      } else {
+        setShowScrollHint(true);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [checking]);
 
   const handleTimeUpdate = () => {
@@ -102,19 +96,11 @@ const IntroVideo = () => {
             הקורס הזה נועד לעזור לך לזהות את ההתנגשויות, לחשוב עליהן, ולפתח כלים להתמודדות.
             אין תשובות שחורות-לבנות. יש חשיבה, רפלקציה, ובחירה מודעת.
           </p>
-          <div className="relative">
-            <img
-              ref={imgRef}
-              src={ruachImage}
-              alt="מסמך רוח צה״ל המקורי – ערכי היסוד"
-              className="w-full rounded-lg shadow-md"
-            />
-            {showScrollHint && (
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
-                <span className="text-xs text-muted-foreground bg-background/80 rounded-full px-2 py-0.5 backdrop-blur-sm">גלול למטה ↓</span>
-              </div>
-            )}
-          </div>
+          <img
+            src={ruachImage}
+            alt="מסמך רוח צה״ל המקורי – ערכי היסוד"
+            className="w-full rounded-lg shadow-md"
+          />
         </div>
 
         <Button
@@ -126,6 +112,15 @@ const IntroVideo = () => {
           {canProceed ? "סיימתי, קדימה" : "צפו בסרטון כדי להמשיך"}
         </Button>
       </div>
+
+      {/* Fixed scroll hint at bottom of screen */}
+      {showScrollHint && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-bounce">
+          <span className="text-sm text-muted-foreground bg-background/90 border border-border rounded-full px-4 py-1.5 backdrop-blur-sm shadow-lg">
+            גלול למטה ↓
+          </span>
+        </div>
+      )}
     </div>
   );
 };

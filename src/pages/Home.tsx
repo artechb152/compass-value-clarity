@@ -61,7 +61,7 @@ const Home = () => {
       const totalCompleted = map.values.completed + map.orders.completed + map.scenarios.completed;
       if (totalCompleted > 0) {
         setHasProgress(true);
-        // Show resume dialog only once per session
+        // Show resume dialog on every new login session (not just first time)
         const sessionKey = `shown_resume_${user.id}`;
         if (!sessionStorage.getItem(sessionKey)) {
           setShowResumeDialog(true);
