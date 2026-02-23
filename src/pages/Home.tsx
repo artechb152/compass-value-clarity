@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
@@ -17,9 +17,19 @@ const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
+  const [introChecked, setIntroChecked] = useState(false);
+  const [introCompleted, setIntroCompleted] = useState(true);
 
   useEffect(() => {
     if (!user) return;
+
+    // Check if intro was completed
+    supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      if (!data?.intro_video_completed) {
+        setIntroCompleted(false);
+      }
+      setIntroChecked(true);
+    });
 
     const loadProgress = async () => {
       const { data: responses } = await supabase.from("responses").select("scenario_id").eq("user_id", user.id);
@@ -55,7 +65,10 @@ const Home = () => {
             const prog = progressMap[mod.key] || { completed: 0, total: mod.total };
             const pct = Math.round((prog.completed / prog.total) * 100);
             const label = prog.completed >= prog.total ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
-            return (
+  if (!introChecked) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
+  if (!introCompleted) return <Navigate to="/intro" replace />;
+
+  return (
               <Link to={mod.to} key={mod.key}>
                 <Card className="hover:shadow-lg transition-shadow border-r-4 border-r-primary/30 mb-2">
                   <CardHeader className="pb-2 flex-row items-center gap-3">
