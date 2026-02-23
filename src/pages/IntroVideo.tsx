@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { PlayCircle, RotateCcw } from "lucide-react";
 import ruachImage from "@/assets/ruach-tzahal.png";
 
 const IntroVideo = () => {
@@ -14,13 +16,21 @@ const IntroVideo = () => {
   const [canProceed, setCanProceed] = useState(false);
   const [checking, setChecking] = useState(true);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [isReturningUser, setIsReturningUser] = useState(false);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
 
   // Check if user already completed intro
   useEffect(() => {
     if (!user) return;
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (data?.intro_video_completed) {
-        navigate("/", { replace: true });
+        // Returning user — show resume dialog instead of skipping
+        setIsReturningUser(true);
+        const resumeShownKey = `resume_shown_${user.id}`;
+        if (!sessionStorage.getItem(resumeShownKey)) {
+          setShowResumeDialog(true);
+          sessionStorage.setItem(resumeShownKey, "1");
+        }
       }
       setChecking(false);
     });
@@ -53,8 +63,16 @@ const IntroVideo = () => {
   const handleProceed = async () => {
     if (!user) return;
     await supabase.from("user_meta").upsert({ user_id: user.id, intro_video_completed: true });
-    sessionStorage.setItem(`from_intro_${user.id}`, "1");
     navigate("/", { replace: true });
+  };
+
+  const handleRestart = async () => {
+    if (!user) return;
+    localStorage.removeItem(`viewed_values_${user.id}`);
+    localStorage.removeItem(`viewed_orders_${user.id}`);
+    await supabase.from("progress").delete().eq("user_id", user.id);
+    await supabase.from("responses").delete().eq("user_id", user.id);
+    setShowResumeDialog(false);
   };
 
   const handleSkipPlaceholder = () => setCanProceed(true);
@@ -116,14 +134,33 @@ const IntroVideo = () => {
         </div>
 
         <Button
-          onClick={handleProceed}
-          disabled={!canProceed}
+          onClick={isReturningUser ? () => navigate("/", { replace: true }) : handleProceed}
+          disabled={!isReturningUser && !canProceed}
           className="w-full text-lg py-6"
           size="lg"
         >
-          סיימתי, קדימה
+          {isReturningUser ? "קדימה" : "סיימתי, קדימה"}
         </Button>
       </div>
+
+      <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
+        <DialogContent className="max-w-sm" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>ברוך/ה השב/ה!</DialogTitle>
+            <DialogDescription>יש לך התקדמות קודמת. מה תרצה/י לעשות?</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-2">
+            <Button onClick={() => { setShowResumeDialog(false); navigate("/", { replace: true }); }} className="w-full gap-2">
+              <PlayCircle className="h-4 w-4" />
+              להמשיך מאיפה שעצרתי
+            </Button>
+            <Button variant="outline" onClick={handleRestart} className="w-full gap-2">
+              <RotateCcw className="h-4 w-4" />
+              להתחיל מחדש
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Fixed scroll hint at bottom of screen */}
       {showScrollHint && (
