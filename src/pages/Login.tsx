@@ -38,6 +38,7 @@ const Login = () => {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (signInError) {
+        // New user – sign up
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -47,6 +48,11 @@ const Login = () => {
 
         const { error: autoSignIn } = await supabase.auth.signInWithPassword({ email, password });
         if (autoSignIn) throw autoSignIn;
+        // First time login – no resume popup
+        sessionStorage.setItem("is_returning_user", "false");
+      } else {
+        // Existing user (same ID number logged in before)
+        sessionStorage.setItem("is_returning_user", "true");
       }
 
       const { data: { user: currentUser } } = await supabase.auth.getUser();
