@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ExternalLink, ArrowRight, CheckCircle } from "lucide-react";
+import { ExternalLink, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const Values = () => {
@@ -69,7 +69,7 @@ const Values = () => {
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{values.length}</span>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 pb-4">
           {values.map((v) => {
             const isViewed = viewedIds.includes(v.id);
             return (
@@ -93,13 +93,19 @@ const Values = () => {
             );
           })}
         </div>
+
+        {values.length > 5 && (
+          <div className="flex justify-center py-2 text-muted-foreground animate-bounce">
+            <ChevronDown className="h-5 w-5" />
+          </div>
+        )}
       </div>
 
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
         <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4" dir="rtl">
           {selected && (
             <div className="space-y-3">
-              <DialogHeader className="text-right pb-0">
+              <DialogHeader className="text-right pb-0 pr-0 pl-8">
                 <DialogTitle className="text-lg text-right leading-snug">{selected.title_he}</DialogTitle>
                 <DialogDescription className="text-right text-xs">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
@@ -118,12 +124,6 @@ const Values = () => {
                 <h3 className="font-semibold text-sm text-primary mb-1">💬 מה זה אומר בפועל?</h3>
                 <p className="text-sm">{selected.youth_microcopy_he}</p>
               </div>
-
-              {selected.example_safe_he && (
-                <div className="text-xs text-muted-foreground border-r-2 border-primary/30 pr-3 mt-2">
-                  💡 דוגמה: {selected.example_safe_he}
-                </div>
-              )}
             </div>
           )}
         </DialogContent>
