@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Trophy } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 // Deterministic shuffle based on user id
@@ -42,6 +43,7 @@ const Scenarios = () => {
   const [reflection, setReflection] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
@@ -114,6 +116,7 @@ const Scenarios = () => {
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
   const allDone = completedCount >= SCENARIOS_PER_USER;
   const progressPct = Math.round((completedCount / SCENARIOS_PER_USER) * 100);
+
 
   return (
     <AppShell>
@@ -231,19 +234,33 @@ const Scenarios = () => {
                   <Button onClick={goNext}>ממשיכים לתרחיש הבא →</Button>
                 ) : allDone ? (
                   <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">סיימת את כל התרחישים! 🎉</p>
-                    <Button onClick={() => navigate("/")} className="w-full" size="lg">
-                      🏁 סיום הקורס – חזרה למסך הראשי
+                    <Button onClick={() => setShowCompletionDialog(true)} className="w-full" size="lg">
+                      סיום הקורס
                     </Button>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">סיימת את כל התרחישים! 🎉</p>
+                  <p className="text-sm text-muted-foreground">סיימת את כל התרחישים!</p>
                 )}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+        <DialogContent className="max-w-sm text-center" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">כל הכבוד!</DialogTitle>
+            <DialogDescription className="text-base mt-2">
+              סיימת את כל התכנים והדילמות בהצלחה. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי.
+            </DialogDescription>
+          </DialogHeader>
+          <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
+          <Button onClick={() => navigate("/")} className="w-full" size="lg">
+            חזרה למסך הראשי
+          </Button>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 };

@@ -5,7 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Shield, FlaskConical, MessageCircleQuestion } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, RotateCcw, PlayCircle } from "lucide-react";
 
 const modules = [
   { key: "values", title: "רוח צה״ל – הערכים", icon: BookOpen, to: "/values", description: "10 ערכי יסוד של רוח צה״ל", total: 10 },
@@ -18,6 +20,8 @@ const Home = () => {
   const navigate = useNavigate();
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
   const [checkingVideo, setCheckingVideo] = useState(true);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [hasProgress, setHasProgress] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -52,9 +56,37 @@ const Home = () => {
       map.orders.completed = viewedOrders.length;
 
       setProgressMap(map);
+
+      // Check if user has any progress at all
+      const totalCompleted = map.values.completed + map.orders.completed + map.scenarios.completed;
+      if (totalCompleted > 0) {
+        setHasProgress(true);
+        // Show resume dialog only once per session
+        const sessionKey = `shown_resume_${user.id}`;
+        if (!sessionStorage.getItem(sessionKey)) {
+          setShowResumeDialog(true);
+          sessionStorage.setItem(sessionKey, "1");
+        }
+      }
     };
     loadProgress();
   }, [user, navigate]);
+
+  const handleRestart = async () => {
+    if (!user) return;
+    // Clear localStorage
+    localStorage.removeItem(`viewed_values_${user.id}`);
+    localStorage.removeItem(`viewed_orders_${user.id}`);
+    // Clear DB progress
+    await supabase.from("progress").delete().eq("user_id", user.id);
+    await supabase.from("responses").delete().eq("user_id", user.id);
+    setProgressMap({
+      values: { completed: 0, total: 10 },
+      orders: { completed: 0, total: 3 },
+      scenarios: { completed: 0, total: 8 },
+    });
+    setShowResumeDialog(false);
+  };
 
   if (checkingVideo) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
@@ -70,7 +102,7 @@ const Home = () => {
           {modules.map((mod, i) => {
             const prog = progressMap[mod.key] || { completed: 0, total: mod.total };
             const pct = Math.round((prog.completed / prog.total) * 100);
-            const label = prog.completed === 0 ? "בתהליך" : prog.completed >= prog.total ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
+            const label = prog.completed >= prog.total ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
             return (
               <Link to={mod.to} key={mod.key}>
                 <Card className="hover:shadow-lg transition-shadow border-r-4 border-r-primary/30 mb-2">
@@ -105,6 +137,25 @@ const Home = () => {
           </Link>
         </div>
       </div>
+
+      <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
+        <DialogContent className="max-w-sm" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>ברוך/ה השב/ה!</DialogTitle>
+            <DialogDescription>יש לך התקדמות קודמת. מה תרצה/י לעשות?</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-2">
+            <Button onClick={() => setShowResumeDialog(false)} className="w-full gap-2">
+              <PlayCircle className="h-4 w-4" />
+              להמשיך מאיפה שעצרתי
+            </Button>
+            <Button variant="outline" onClick={handleRestart} className="w-full gap-2">
+              <RotateCcw className="h-4 w-4" />
+              להתחיל מחדש
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 };

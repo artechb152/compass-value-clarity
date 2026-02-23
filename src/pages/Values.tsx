@@ -99,7 +99,7 @@ const Values = () => {
       </div>
 
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-lg h-[80vh] overflow-y-auto" dir="rtl">
           {selected && (
             <>
               <DialogHeader>
