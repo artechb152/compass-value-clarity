@@ -199,12 +199,14 @@ const Scenarios = () => {
                 </div>
 
                 <div className="space-y-4">
+                  <p className="text-sm font-medium text-primary">הזיזו את הסמן לפי מה שהרגשתם בדילמה:</p>
                   <div>
                     <div className="flex justify-between text-xs text-muted-foreground mb-1">
                       <span>משימה</span>
                       <span>כבוד האדם</span>
                     </div>
                     <Slider value={tensionMH} onValueChange={setTensionMH} max={100} step={1} aria-label="מתח: משימה מול כבוד האדם" />
+                    <p className="text-[11px] text-muted-foreground mt-1 text-center">לאן נוטה הדילמה הזו מבחינתך?</p>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs text-muted-foreground mb-1">
@@ -212,6 +214,7 @@ const Scenarios = () => {
                       <span>אחריות אישית</span>
                     </div>
                     <Slider value={tensionDR} onValueChange={setTensionDR} max={100} step={1} aria-label="מתח: משמעת מול אחריות אישית" />
+                    <p className="text-[11px] text-muted-foreground mt-1 text-center">לאן נוטה הדילמה הזו מבחינתך?</p>
                   </div>
                 </div>
 
