@@ -73,15 +73,15 @@ const Login = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <Label htmlFor="fullName">שם מלא</Label>
-              <Input id="fullName" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="ישראל ישראלי" required />
+              <Input id="fullName" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="ישראל ישראלי" className="placeholder:text-muted-foreground/40" required />
             </div>
             <div>
               <Label htmlFor="idNumber">מספר תעודת זהות</Label>
-              <Input id="idNumber" type="text" inputMode="numeric" maxLength={9} value={idNumber} onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 9))} placeholder="123456789" dir="ltr" required />
+              <Input id="idNumber" type="text" inputMode="numeric" maxLength={9} value={idNumber} onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 9))} placeholder="123456789" dir="ltr" className="placeholder:text-muted-foreground/40" required />
             </div>
             <div>
               <Label htmlFor="courseName">שם קורס</Label>
-              <Input id="courseName" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} placeholder="קורס קצינים" required />
+              <Input id="courseName" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} placeholder="קורס קצינים" className="placeholder:text-muted-foreground/40" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "נכנס/ת..." : "כניסה"}
