@@ -88,11 +88,16 @@ const IntroVideo = () => {
             הקורס הזה נועד לעזור לך לזהות את ההתנגשויות, לחשוב עליהן, ולפתח כלים להתמודדות.
             אין תשובות שחורות-לבנות. יש חשיבה, רפלקציה, ובחירה מודעת.
           </p>
-          <img
-            src={ruachImage}
-            alt="מסמך רוח צה״ל המקורי – ערכי היסוד"
-            className="w-full rounded-lg shadow-md"
-          />
+          <div className="relative">
+            <img
+              src={ruachImage}
+              alt="מסמך רוח צה״ל המקורי – ערכי היסוד"
+              className="w-full rounded-lg shadow-md"
+            />
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
+              <span className="text-xs text-muted-foreground bg-background/80 rounded-full px-2 py-0.5 backdrop-blur-sm">גלול למטה ↓</span>
+            </div>
+          </div>
         </div>
 
         <Button
@@ -101,7 +106,7 @@ const IntroVideo = () => {
           className="w-full text-lg py-6"
           size="lg"
         >
-          {canProceed ? "סיימתי, קדימה 🚀" : "צפו בסרטון כדי להמשיך"}
+          {canProceed ? "סיימתי, קדימה" : "צפו בסרטון כדי להמשיך"}
         </Button>
       </div>
     </div>
