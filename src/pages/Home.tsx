@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
@@ -15,7 +15,6 @@ const modules = [
 
 const Home = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
   const [introChecked, setIntroChecked] = useState(false);
   const [introCompleted, setIntroCompleted] = useState(true);
@@ -23,7 +22,6 @@ const Home = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Check if intro was completed
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (!data?.intro_video_completed) {
         setIntroCompleted(false);
@@ -52,6 +50,20 @@ const Home = () => {
     loadProgress();
   }, [user]);
 
+  if (!introChecked) {
+    return (
+      <AppShell>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (!introCompleted) {
+    return <Navigate to="/intro" replace />;
+  }
+
   return (
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto space-y-6">
@@ -65,10 +77,7 @@ const Home = () => {
             const prog = progressMap[mod.key] || { completed: 0, total: mod.total };
             const pct = Math.round((prog.completed / prog.total) * 100);
             const label = prog.completed >= prog.total ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
-  if (!introChecked) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
-  if (!introCompleted) return <Navigate to="/intro" replace />;
-
-  return (
+            return (
               <Link to={mod.to} key={mod.key}>
                 <Card className="hover:shadow-lg transition-shadow border-r-4 border-r-primary/30 mb-2">
                   <CardHeader className="pb-2 flex-row items-center gap-3">
@@ -92,7 +101,6 @@ const Home = () => {
           })}
         </div>
 
-        {/* Quick Access */}
         <div className="flex justify-center pt-4">
           <Link to="/weekly">
             <Card className="text-center p-3 hover:shadow transition-shadow">
@@ -102,7 +110,6 @@ const Home = () => {
           </Link>
         </div>
       </div>
-
     </AppShell>
   );
 };

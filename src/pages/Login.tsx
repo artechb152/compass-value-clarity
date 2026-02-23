@@ -7,9 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
 
 const Login = () => {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [fullName, setFullName] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [courseName, setCourseName] = useState("");
@@ -63,7 +66,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-primary/10 to-background" dir="rtl">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-primary/10 to-background relative" dir="rtl">
+      <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="absolute top-4 left-4 text-muted-foreground" aria-label="החלף מצב תצוגה">
+        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </Button>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">רוח צה״ל</CardTitle>

@@ -5,11 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { PlayCircle, RotateCcw } from "lucide-react";
+import { PlayCircle, RotateCcw, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import ruachImage from "@/assets/ruach-tzahal.png";
 
 const IntroVideo = () => {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
@@ -24,7 +26,6 @@ const IntroVideo = () => {
     if (!user) return;
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (data?.intro_video_completed) {
-        // Returning user — show resume dialog instead of skipping
         setIsReturningUser(true);
         const resumeShownKey = `resume_shown_${user.id}`;
         if (!sessionStorage.getItem(resumeShownKey)) {
@@ -36,7 +37,6 @@ const IntroVideo = () => {
     });
   }, [user, navigate]);
 
-  // Hide scroll hint when user scrolls near bottom
   useEffect(() => {
     if (checking) return;
     const handleScroll = () => {
@@ -80,12 +80,14 @@ const IntroVideo = () => {
   if (checking) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-background flex flex-col items-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-b from-primary/10 to-background flex flex-col items-center p-4 relative" dir="rtl">
+      <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="absolute top-4 left-4 text-muted-foreground" aria-label="החלף מצב תצוגה">
+        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </Button>
       <div className="w-full max-w-2xl mt-8">
         <h1 className="text-3xl font-bold text-primary text-center mb-1">רגע רוח צה״ל</h1>
         <p className="text-center text-muted-foreground mb-6">לפני שמתחילים – 2 דקות על מה שמוביל אותנו</p>
 
-        {/* Placeholder video */}
         <div className="bg-card rounded-xl overflow-hidden shadow-lg mb-4">
           <div className="relative aspect-video bg-primary/20 flex items-center justify-center">
             <video
@@ -114,7 +116,6 @@ const IntroVideo = () => {
           </div>
         </div>
 
-        {/* What is Ruach Tzahal */}
         <div className="bg-card rounded-xl shadow px-4 py-5 mb-6 space-y-4">
           <h2 className="text-xl font-bold text-primary text-center">אז מה זה בעצם רוח צה״ל?</h2>
           <p className="text-sm leading-relaxed text-foreground/80">
@@ -162,7 +163,6 @@ const IntroVideo = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Fixed scroll hint at bottom of screen */}
       {showScrollHint && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-bounce">
           <span className="text-sm text-muted-foreground bg-background/90 border border-border rounded-full px-4 py-1.5 backdrop-blur-sm shadow-lg">
