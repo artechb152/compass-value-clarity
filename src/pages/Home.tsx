@@ -21,7 +21,6 @@ const Home = () => {
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
   const [checkingVideo, setCheckingVideo] = useState(true);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
-  const [hasProgress, setHasProgress] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -32,13 +31,8 @@ const Home = () => {
       setCheckingVideo(false);
     });
 
-    // Load progress: count completed items per module from responses/progress
+    // Load progress
     const loadProgress = async () => {
-      // Values: count distinct values opened (stored in progress detail or we track via localStorage approach)
-      // For now use progress table status
-      const { data: prog } = await supabase.from("progress").select("module_key, status").eq("user_id", user.id);
-      
-      // Count scenario responses
       const { data: responses } = await supabase.from("responses").select("scenario_id").eq("user_id", user.id);
       const scenarioCount = new Set(responses?.map(r => r.scenario_id)).size;
 
@@ -48,7 +42,6 @@ const Home = () => {
         scenarios: { completed: scenarioCount, total: 8 },
       };
 
-      // Check values progress from localStorage
       const viewedValues = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
       map.values.completed = viewedValues.length;
 
@@ -57,15 +50,16 @@ const Home = () => {
 
       setProgressMap(map);
 
-      // Check if user has any progress at all
+      // Show resume dialog only once, right after intro video, on 2nd+ login
       const totalCompleted = map.values.completed + map.orders.completed + map.scenarios.completed;
-      if (totalCompleted > 0) {
-        setHasProgress(true);
-        // Show resume dialog on every new login session (not just first time)
-        const sessionKey = `shown_resume_${user.id}`;
-        if (!sessionStorage.getItem(sessionKey)) {
+      const resumeShownKey = `resume_shown_after_intro_${user.id}`;
+      if (totalCompleted > 0 && !sessionStorage.getItem(resumeShownKey)) {
+        // Check if this came from intro video redirect (flag set there)
+        const fromIntro = sessionStorage.getItem(`from_intro_${user.id}`);
+        if (fromIntro) {
           setShowResumeDialog(true);
-          sessionStorage.setItem(sessionKey, "1");
+          sessionStorage.setItem(resumeShownKey, "1");
+          sessionStorage.removeItem(`from_intro_${user.id}`);
         }
       }
     };

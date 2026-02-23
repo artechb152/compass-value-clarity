@@ -140,7 +140,6 @@ const Scenarios = () => {
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-primary">מעבדת דילמות</h1>
           </div>
-          <span className="text-sm text-muted-foreground">{currentIdx + 1}/{scenarios.length}</span>
         </div>
 
         {/* Progress bar */}

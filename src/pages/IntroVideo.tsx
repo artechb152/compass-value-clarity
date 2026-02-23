@@ -53,6 +53,7 @@ const IntroVideo = () => {
   const handleProceed = async () => {
     if (!user) return;
     await supabase.from("user_meta").upsert({ user_id: user.id, intro_video_completed: true });
+    sessionStorage.setItem(`from_intro_${user.id}`, "1");
     navigate("/", { replace: true });
   };
 
@@ -120,7 +121,7 @@ const IntroVideo = () => {
           className="w-full text-lg py-6"
           size="lg"
         >
-          {canProceed ? "סיימתי, קדימה" : "צפו בסרטון כדי להמשיך"}
+          סיימתי, קדימה
         </Button>
       </div>
 
