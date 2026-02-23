@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -69,28 +69,26 @@ const Values = () => {
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{values.length}</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-3">
           {values.map((v) => {
             const isViewed = viewedIds.includes(v.id);
             return (
               <Card
                 key={v.id}
-                className={`cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02] border-t-4 ${isViewed ? "border-t-green-500" : "border-t-primary/20"}`}
+                className={`cursor-pointer hover:shadow-md transition-all border-r-4 ${isViewed ? "border-r-green-500" : "border-r-primary/20"}`}
                 onClick={() => openValue(v)}
                 role="button"
                 tabIndex={0}
                 aria-label={`ערך: ${v.title_he}`}
                 onKeyDown={(e) => e.key === "Enter" && openValue(v)}
               >
-                <CardHeader className="pb-2 pt-3 px-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base leading-tight">{v.title_he}</CardTitle>
-                    {isViewed && <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />}
+                <div className="flex items-center gap-3 p-3">
+                  {isViewed && <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm">{v.title_he}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{v.youth_microcopy_he}</p>
                   </div>
-                </CardHeader>
-                <CardContent className="px-3 pb-3">
-                  <p className="text-xs text-muted-foreground line-clamp-2">{v.youth_microcopy_he}</p>
-                </CardContent>
+                </div>
               </Card>
             );
           })}
@@ -98,37 +96,35 @@ const Values = () => {
       </div>
 
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-lg h-[80vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4" dir="rtl">
           {selected && (
-            <>
-              <DialogHeader className="text-right">
-                <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
-                <DialogDescription className="text-right">ערך מתוך רוח צה״ל</DialogDescription>
+            <div className="space-y-3">
+              <DialogHeader className="text-right pb-0">
+                <DialogTitle className="text-lg text-right leading-snug">{selected.title_he}</DialogTitle>
+                <DialogDescription className="text-right text-xs">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-sm text-primary mb-1 text-right">ההגדרה הרשמית</h3>
-                  <p className="text-sm leading-relaxed">{selected.official_definition_he}</p>
-                  {selected.source_url && (
-                    <a href={selected.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
-                      מקור <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                </div>
-
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <h3 className="font-semibold text-sm text-primary mb-1 text-right">💬 מה זה אומר בפועל?</h3>
-                  <p className="text-sm">{selected.youth_microcopy_he}</p>
-                </div>
-
-                {selected.example_safe_he && (
-                  <div className="text-xs text-muted-foreground border-r-2 border-primary/30 pr-3">
-                    💡 דוגמה: {selected.example_safe_he}
-                  </div>
+              <div>
+                <h3 className="font-semibold text-sm text-primary mb-1">ההגדרה הרשמית</h3>
+                <p className="text-sm leading-relaxed">{selected.official_definition_he}</p>
+                {selected.source_url && (
+                  <a href={selected.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
+                    מקור <ExternalLink className="h-3 w-3" />
+                  </a>
                 )}
               </div>
-            </>
+
+              <div className="bg-muted/50 rounded-lg p-3">
+                <h3 className="font-semibold text-sm text-primary mb-1">💬 מה זה אומר בפועל?</h3>
+                <p className="text-sm">{selected.youth_microcopy_he}</p>
+              </div>
+
+              {selected.example_safe_he && (
+                <div className="text-xs text-muted-foreground border-r-2 border-primary/30 pr-3 mt-2">
+                  💡 דוגמה: {selected.example_safe_he}
+                </div>
+              )}
+            </div>
           )}
         </DialogContent>
       </Dialog>
