@@ -10,9 +10,11 @@ const IntroVideo = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const [progress, setProgress] = useState(0);
   const [canProceed, setCanProceed] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [showScrollHint, setShowScrollHint] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -23,6 +25,18 @@ const IntroVideo = () => {
       setChecking(false);
     });
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (checking) return;
+    const el = imgRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowScrollHint(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [checking]);
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
@@ -90,13 +104,16 @@ const IntroVideo = () => {
           </p>
           <div className="relative">
             <img
+              ref={imgRef}
               src={ruachImage}
               alt="מסמך רוח צה״ל המקורי – ערכי היסוד"
               className="w-full rounded-lg shadow-md"
             />
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
-              <span className="text-xs text-muted-foreground bg-background/80 rounded-full px-2 py-0.5 backdrop-blur-sm">גלול למטה ↓</span>
-            </div>
+            {showScrollHint && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce">
+                <span className="text-xs text-muted-foreground bg-background/80 rounded-full px-2 py-0.5 backdrop-blur-sm">גלול למטה ↓</span>
+              </div>
+            )}
           </div>
         </div>
 
