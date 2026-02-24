@@ -42,6 +42,7 @@ export type Database = {
         Row: {
           id: string
           mini_choices_json: Json | null
+          mini_feedback_json: Json | null
           mini_scenario_he: string | null
           official_definition_he: string | null
           red_flags_json: Json | null
@@ -53,6 +54,7 @@ export type Database = {
         Insert: {
           id: string
           mini_choices_json?: Json | null
+          mini_feedback_json?: Json | null
           mini_scenario_he?: string | null
           official_definition_he?: string | null
           red_flags_json?: Json | null
@@ -64,6 +66,7 @@ export type Database = {
         Update: {
           id?: string
           mini_choices_json?: Json | null
+          mini_feedback_json?: Json | null
           mini_scenario_he?: string | null
           official_definition_he?: string | null
           red_flags_json?: Json | null
@@ -252,6 +255,7 @@ export type Database = {
           quick_exercise_question_he: string | null
           source_url: string | null
           title_he: string
+          what_it_means_in_practice_he: string | null
           youth_microcopy_he: string | null
         }
         Insert: {
@@ -261,6 +265,7 @@ export type Database = {
           quick_exercise_question_he?: string | null
           source_url?: string | null
           title_he: string
+          what_it_means_in_practice_he?: string | null
           youth_microcopy_he?: string | null
         }
         Update: {
@@ -270,6 +275,7 @@ export type Database = {
           quick_exercise_question_he?: string | null
           source_url?: string | null
           title_he?: string
+          what_it_means_in_practice_he?: string | null
           youth_microcopy_he?: string | null
         }
         Relationships: []
