@@ -123,7 +123,7 @@ const IntroVideo = () => {
           className="w-full text-lg py-6"
           size="lg"
         >
-          {isReturningUser ? "קדימה" : "קדימה"}
+          קדימה, מתחילים
         </Button>
       </div>
 
