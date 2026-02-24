@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PlayCircle, RotateCcw, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -13,9 +12,6 @@ const IntroVideo = () => {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [canProceed, setCanProceed] = useState(false);
   const [checking, setChecking] = useState(true);
   const [showScrollHint, setShowScrollHint] = useState(true);
   const [isReturningUser, setIsReturningUser] = useState(false);
@@ -59,13 +55,6 @@ const IntroVideo = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [checking]);
 
-  const handleTimeUpdate = () => {
-    if (!videoRef.current) return;
-    const pct = (videoRef.current.currentTime / videoRef.current.duration) * 100;
-    setProgress(pct);
-    if (pct >= 85) setCanProceed(true);
-  };
-
   const handleProceed = async () => {
     if (!user) return;
     await supabase.from("user_meta").upsert({ user_id: user.id, intro_video_completed: true });
@@ -83,7 +72,7 @@ const IntroVideo = () => {
     setShowResumeDialog(false);
   };
 
-  const handleSkipPlaceholder = () => setCanProceed(true);
+  
 
   if (checking) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
@@ -94,34 +83,21 @@ const IntroVideo = () => {
       </Button>
       <div className="w-full max-w-2xl mt-8">
         <h1 className="text-3xl font-bold text-primary text-center mb-1">רגע רוח צה״ל</h1>
-        <p className="text-center text-muted-foreground mb-6">לפני שמתחילים – 2 דקות על מה שמוביל אותנו</p>
+        <p className="text-center text-muted-foreground mb-6">לפני שמתחילים – 3 דקות על מה שמוביל אותנו</p>
 
         <div className="bg-card rounded-xl overflow-hidden shadow-lg mb-4">
-          <div className="relative aspect-video bg-primary/20 flex items-center justify-center">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={() => setCanProceed(true)}
-              controls
-              aria-label="סרטון רוח צה״ל"
-            >
-              <track kind="captions" label="עברית" srcLang="he" default />
-              הדפדפן שלך לא תומך בנגן וידאו.
-            </video>
-            {!videoRef.current?.src && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-primary/10">
-                <span className="text-6xl">🎬</span>
-                <p className="text-muted-foreground text-sm">סרטון placeholder – יתעדכן בהמשך</p>
-                <Button variant="outline" size="sm" onClick={handleSkipPlaceholder}>
-                  דלג/י (placeholder)
-                </Button>
-              </div>
-            )}
+          <div className="relative aspect-video">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/OfpjyRBhAYc"
+              title="סרטון רוח צה״ל"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
-          <div className="px-4 py-2">
-            <Progress value={progress} className="h-2" />
-          </div>
+          <p className="text-xs text-muted-foreground text-center py-2 px-3">
+            הסרטון מתוך ערוץ היוטיוב של צה״ל. כל הזכויות שמורות ליוצרים.
+          </p>
         </div>
 
         <div className="bg-card rounded-xl shadow px-4 py-5 mb-6 space-y-4">
@@ -144,11 +120,10 @@ const IntroVideo = () => {
 
         <Button
           onClick={isReturningUser ? () => navigate("/", { replace: true }) : handleProceed}
-          disabled={!isReturningUser && !canProceed}
           className="w-full text-lg py-6"
           size="lg"
         >
-          {isReturningUser ? "קדימה" : "סיימתי, קדימה"}
+          {isReturningUser ? "קדימה" : "קדימה"}
         </Button>
       </div>
 
