@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { PlayCircle, RotateCcw, Sun, Moon } from "lucide-react";
+import { PlayCircle, RotateCcw, Sun, Moon, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 import ruachImage from "@/assets/ruach-tzahal.png";
 
@@ -58,6 +58,8 @@ const IntroVideo = () => {
   const handleProceed = async () => {
     if (!user) return;
     await supabase.from("user_meta").upsert({ user_id: user.id, intro_video_completed: true });
+    // Mark intro as seen this session so Home won't redirect back
+    sessionStorage.setItem(`intro_seen_this_session_${user.id}`, "1");
     navigate("/", { replace: true });
   };
 
@@ -95,7 +97,7 @@ const IntroVideo = () => {
               allowFullScreen
             />
           </div>
-          <p className="text-xs text-muted-foreground text-center py-2 px-3">
+          <p className="text-[10px] text-muted-foreground/50 text-center py-1.5 px-3">
             הסרטון מתוך ערוץ היוטיוב של צה״ל. כל הזכויות שמורות ליוצרים.
           </p>
         </div>
@@ -119,7 +121,7 @@ const IntroVideo = () => {
         </div>
 
         <Button
-          onClick={isReturningUser ? () => navigate("/", { replace: true }) : handleProceed}
+          onClick={isReturningUser ? () => { sessionStorage.setItem(`intro_seen_this_session_${user?.id}`, "1"); navigate("/", { replace: true }); } : handleProceed}
           className="w-full text-lg py-6"
           size="lg"
         >
@@ -129,12 +131,12 @@ const IntroVideo = () => {
 
       <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
         <DialogContent className="max-w-sm" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>ברוך/ה השב/ה!</DialogTitle>
-            <DialogDescription>יש לך התקדמות קודמת. מה תרצה/י לעשות?</DialogDescription>
+          <DialogHeader className="text-right">
+            <DialogTitle className="text-right">ברוך/ה השב/ה!</DialogTitle>
+            <DialogDescription className="text-right">יש לך התקדמות קודמת. מה תרצה/י לעשות?</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-2">
-            <Button onClick={() => { setShowResumeDialog(false); navigate("/", { replace: true }); }} className="w-full gap-2">
+            <Button onClick={() => { setShowResumeDialog(false); sessionStorage.setItem(`intro_seen_this_session_${user?.id}`, "1"); navigate("/", { replace: true }); }} className="w-full gap-2">
               <PlayCircle className="h-4 w-4" />
               להמשיך מאיפה שעצרתי
             </Button>
@@ -147,10 +149,8 @@ const IntroVideo = () => {
       </Dialog>
 
       {showScrollHint && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-bounce">
-          <span className="text-sm text-muted-foreground bg-background/90 border border-border rounded-full px-4 py-1.5 backdrop-blur-sm shadow-lg">
-            גלול למטה ↓
-          </span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex justify-center">
+          <ChevronDown className="h-6 w-6 text-muted-foreground/40" />
         </div>
       )}
     </div>

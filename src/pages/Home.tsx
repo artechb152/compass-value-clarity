@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Shield, FlaskConical, MessageCircleQuestion } from "lucide-react";
+import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight } from "lucide-react";
 
 const modules = [
   { key: "values", title: "רוח צה״ל – הערכים", icon: BookOpen, to: "/values", description: "10 ערכי יסוד של רוח צה״ל", total: 10 },
@@ -15,6 +16,7 @@ const modules = [
 
 const Home = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
   const [introChecked, setIntroChecked] = useState(false);
   const [introCompleted, setIntroCompleted] = useState(true);
@@ -22,14 +24,12 @@ const Home = () => {
   useEffect(() => {
     if (!user) return;
 
-    supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-      // Only redirect to intro if user_meta exists AND intro not completed
-      // If no user_meta row exists, treat as completed (don't block returning users)
-      if (data && !data.intro_video_completed) {
-        setIntroCompleted(false);
-      }
-      setIntroChecked(true);
-    });
+    // Always show intro screen on fresh session (no sessionStorage flag = new session)
+    const introSeenKey = `intro_seen_this_session_${user.id}`;
+    if (!sessionStorage.getItem(introSeenKey)) {
+      setIntroCompleted(false);
+    }
+    setIntroChecked(true);
 
     const loadProgress = async () => {
       const { data: responses } = await supabase.from("responses").select("scenario_id").eq("user_id", user.id);
@@ -72,6 +72,10 @@ const Home = () => {
         <div className="text-center py-6">
           <h1 className="text-3xl font-bold text-primary mb-1">רוח צה״ל</h1>
           <p className="text-muted-foreground">התנגשות בין ערכים – המסלול שלך</p>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/intro")} className="mt-2 text-xs text-muted-foreground gap-1">
+            <ArrowRight className="h-4 w-4" />
+            חזרה למסך הפתיחה
+          </Button>
         </div>
 
         <div className="space-y-4">
