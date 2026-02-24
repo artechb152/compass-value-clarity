@@ -59,7 +59,7 @@ const Values = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-primary">רוח צה״ל – הערכים</h1>
-            <p className="text-muted-foreground text-sm">10 ערכי יסוד. לחצ/י על ערך כדי ללמוד ולתרגל.</p>
+            <p className="text-muted-foreground text-sm">11 ערכי יסוד. לחצ/י על ערך כדי ללמוד ולתרגל.</p>
           </div>
         </div>
 
@@ -95,10 +95,8 @@ const Values = () => {
         </div>
 
         {values.length > 5 && (
-          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 animate-bounce pointer-events-none">
-            <span className="text-sm text-muted-foreground bg-background/90 border border-border rounded-full px-4 py-1.5 backdrop-blur-sm shadow-lg flex items-center gap-1">
-              גלול למטה <ChevronDown className="h-4 w-4" />
-            </span>
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex justify-center">
+            <ChevronDown className="h-6 w-6 text-muted-foreground/40" />
           </div>
         )}
       </div>
@@ -109,7 +107,7 @@ const Values = () => {
             <div className="space-y-3">
               <DialogHeader className="text-right pb-0 pr-10 pl-0">
                 <DialogTitle className="text-lg text-right leading-snug">{selected.title_he}</DialogTitle>
-                <DialogDescription className="text-right text-xs">ערך מתוך רוח צה״ל</DialogDescription>
+                <DialogDescription className="sr-only">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
 
               <div>
