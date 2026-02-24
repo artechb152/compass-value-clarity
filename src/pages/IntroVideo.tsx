@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PlayCircle, RotateCcw, Sun, Moon, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
-import ruachImage from "@/assets/ruach-tzahal.png";
+import ruachImage from "@/assets/ruach-tzahal-poster.png";
 
 const IntroVideo = () => {
   const { user } = useAuth();
