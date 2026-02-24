@@ -95,8 +95,10 @@ const Values = () => {
         </div>
 
         {values.length > 5 && (
-          <div className="flex justify-center py-2 text-muted-foreground animate-bounce">
-            <ChevronDown className="h-5 w-5" />
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 animate-bounce pointer-events-none">
+            <span className="text-sm text-muted-foreground bg-background/90 border border-border rounded-full px-4 py-1.5 backdrop-blur-sm shadow-lg flex items-center gap-1">
+              גלול למטה <ChevronDown className="h-4 w-4" />
+            </span>
           </div>
         )}
       </div>
@@ -105,8 +107,8 @@ const Values = () => {
         <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4" dir="rtl">
           {selected && (
             <div className="space-y-3">
-              <DialogHeader className="text-right pb-0 pr-0 pl-12">
-                <DialogTitle className="text-lg text-right leading-snug">{selected.title_he}</DialogTitle>
+              <DialogHeader className="text-right pb-0 pr-0 pl-0">
+                <DialogTitle className="text-lg text-right leading-snug pe-0 ps-10">{selected.title_he}</DialogTitle>
                 <DialogDescription className="text-right text-xs">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
 

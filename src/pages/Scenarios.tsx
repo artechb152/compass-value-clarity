@@ -149,18 +149,18 @@ const Scenarios = () => {
         </div>
 
         <Card className="mb-4">
-          <CardHeader>
-            <CardTitle className="text-lg">{scenario.title_he}</CardTitle>
+          <CardHeader className="p-3 sm:p-6">
+            <CardTitle className="text-base sm:text-lg leading-snug break-words">{scenario.title_he}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm whitespace-pre-line leading-relaxed mb-4">{scenario.story_he}</p>
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <p className="text-sm whitespace-pre-line leading-relaxed mb-4 break-words">{scenario.story_he}</p>
 
             {chosenIdx === null && !completedIds.has(scenario.id) && (
               <>
                 <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר—איזה ערך פה מתנגש לך בראש?</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
-                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-3 px-4" onClick={() => setChosenIdx(i)}>
+                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-3 px-3 text-sm break-words whitespace-normal" onClick={() => setChosenIdx(i)}>
                       {c}
                     </Button>
                   ))}

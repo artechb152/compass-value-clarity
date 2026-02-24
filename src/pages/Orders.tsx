@@ -154,7 +154,7 @@ const Orders = () => {
                 </div>
               </div>
 
-              <Button onClick={() => setSelected(null)} className="w-full mt-2">סגור</Button>
+              
             </>
           )}
         </DialogContent>
