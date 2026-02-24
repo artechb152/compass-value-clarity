@@ -120,10 +120,12 @@ const Values = () => {
                 )}
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-3">
-                <h3 className="font-semibold text-sm text-primary mb-1">💬 מה זה אומר בפועל?</h3>
-                <p className="text-sm">{selected.youth_microcopy_he}</p>
-              </div>
+              {(selected as any).what_it_means_in_practice_he && (
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <h3 className="font-semibold text-sm text-primary mb-1">💬 מה זה אומר בפועל?</h3>
+                  <p className="text-sm">{(selected as any).what_it_means_in_practice_he}</p>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
