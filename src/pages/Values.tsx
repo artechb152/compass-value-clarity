@@ -107,7 +107,7 @@ const Values = () => {
         <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4" dir="rtl">
           {selected && (
             <div className="space-y-3">
-              <DialogHeader className="text-right pb-0 pe-10 ps-0">
+              <DialogHeader className="text-right pb-0 pr-10 pl-0">
                 <DialogTitle className="text-lg text-right leading-snug">{selected.title_he}</DialogTitle>
                 <DialogDescription className="text-right text-xs">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
