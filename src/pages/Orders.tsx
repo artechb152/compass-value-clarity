@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ExternalLink, AlertTriangle, CheckCircle, XCircle, ArrowRight } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+
+interface MiniFeedback { choice_index: number; title: string; text: string; }
 
 const typeConfig: Record<string, { icon: React.ElementType; color: string; bgColor: string }> = {
   legal: { icon: CheckCircle, color: "text-green-700", bgColor: "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800" },
@@ -22,6 +24,7 @@ const Orders = () => {
   const [orders, setOrders] = useState<Tables<"orders">[]>([]);
   const [selected, setSelected] = useState<Tables<"orders"> | null>(null);
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -113,13 +116,13 @@ const Orders = () => {
                   )}
                 </div>
 
-                <div className="bg-destructive/5 rounded-lg p-3">
+                <div className="bg-destructive/5 rounded-lg p-3" dir="rtl">
                   <h3 className="font-semibold text-sm text-destructive mb-2">🚩 Red Flags</h3>
-                  <ul className="space-y-1" dir="rtl">
+                  <ul className="space-y-1">
                     {(selected.red_flags_json as string[] || []).map((flag, i) => (
-                      <li key={i} className="text-sm flex flex-row items-start gap-2">
-                        <span className="text-destructive shrink-0">•</span>
-                        <span>{flag}</span>
+                      <li key={i} className="text-sm flex items-start gap-2" style={{ direction: "rtl" }}>
+                        <span className="text-destructive shrink-0 mt-0.5">•</span>
+                        <span className="text-right flex-1">{flag}</span>
                       </li>
                     ))}
                   </ul>
@@ -145,7 +148,14 @@ const Orders = () => {
                         key={i}
                         variant={miniChoice === i ? "default" : "outline"}
                         className="w-full text-right justify-start h-auto py-2 px-3"
-                        onClick={() => setMiniChoice(i)}
+                        onClick={() => {
+                          setMiniChoice(i);
+                          const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
+                          if (feedbacks) {
+                            const fb = feedbacks.find(f => f.choice_index === i);
+                            if (fb) setFeedbackModal(fb);
+                          }
+                        }}
                       >
                         {choice}
                       </Button>
@@ -155,6 +165,21 @@ const Orders = () => {
               </div>
 
               
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!feedbackModal} onOpenChange={() => setFeedbackModal(null)}>
+        <DialogContent className="max-w-sm" dir="rtl" role="dialog" aria-modal="true">
+          {feedbackModal && (
+            <>
+              <DialogHeader className="text-right pe-10 ps-0">
+                <DialogTitle className="text-lg text-right">{feedbackModal.title}</DialogTitle>
+                <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
+              </DialogHeader>
+              <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
+              <Button onClick={() => setFeedbackModal(null)} className="w-full mt-2">הבנתי</Button>
             </>
           )}
         </DialogContent>
