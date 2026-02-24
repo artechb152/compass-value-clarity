@@ -169,9 +169,12 @@ const Scenarios = () => {
             )}
 
             {completedIds.has(scenario.id) && chosenIdx === null && (
-              <div className="text-center py-4">
+              <div className="text-center py-4 space-y-3">
                 <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <p className="text-green-600 font-medium">תרחיש זה כבר הושלם ✓</p>
+                {currentIdx < scenarios.length - 1 && (
+                  <Button onClick={goNext}>ממשיכים לתרחיש הבא →</Button>
+                )}
               </div>
             )}
 

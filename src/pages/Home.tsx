@@ -23,7 +23,9 @@ const Home = () => {
     if (!user) return;
 
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-      if (!data?.intro_video_completed) {
+      // Only redirect to intro if user_meta exists AND intro not completed
+      // If no user_meta row exists, treat as completed (don't block returning users)
+      if (data && !data.intro_video_completed) {
         setIntroCompleted(false);
       }
       setIntroChecked(true);
