@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight } from "lucide-react";
 
 const modules = [
-  { key: "values", title: "רוח צה״ל – הערכים", icon: BookOpen, to: "/values", description: "10 ערכי יסוד של רוח צה״ל", total: 10 },
+  { key: "values", title: "רוח צה״ל – הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
   { key: "orders", title: "פקודות", icon: Shield, to: "/orders", description: "חוקית / בלתי חוקית / בלתי חוקית בעליל", total: 3 },
   { key: "scenarios", title: "מעבדת דילמות", icon: FlaskConical, to: "/scenarios", description: "תרחישים אינטראקטיביים עם התנגשויות ערכיות", total: 8 },
 ];
@@ -36,7 +36,7 @@ const Home = () => {
       const scenarioCount = new Set(responses?.map(r => r.scenario_id)).size;
 
       const map: Record<string, { completed: number; total: number }> = {
-        values: { completed: 0, total: 10 },
+        values: { completed: 0, total: 11 },
         orders: { completed: 0, total: 3 },
         scenarios: { completed: scenarioCount, total: 8 },
       };
@@ -72,9 +72,8 @@ const Home = () => {
         <div className="text-center py-6">
           <h1 className="text-3xl font-bold text-primary mb-1">רוח צה״ל</h1>
           <p className="text-muted-foreground">התנגשות בין ערכים – המסלול שלך</p>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/intro")} className="mt-2 text-xs text-muted-foreground gap-1">
-            <ArrowRight className="h-4 w-4" />
-            חזרה למסך הפתיחה
+          <Button variant="ghost" size="icon" onClick={() => navigate("/intro")} className="mt-2" aria-label="חזרה למסך הפתיחה">
+            <ArrowRight className="h-5 w-5 text-muted-foreground" />
           </Button>
         </div>
 

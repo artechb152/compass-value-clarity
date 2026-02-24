@@ -86,7 +86,7 @@ const Values = () => {
                   {isViewed && <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm">{v.title_he}</h3>
-                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{v.youth_microcopy_he}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{v.official_definition_he}</p>
                   </div>
                 </div>
               </Card>
