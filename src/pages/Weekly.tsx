@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { ArrowRight } from "lucide-react";
 import type { Tables, Json } from "@/integrations/supabase/types";
 
 // Get current ISO week key
@@ -28,6 +30,7 @@ function hashSeed(str: string): number {
 
 const Weekly = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [poll, setPoll] = useState<Tables<"weekly_polls"> | null>(null);
   const [voted, setVoted] = useState(false);
   const [myVote, setMyVote] = useState<number | null>(null);
@@ -77,8 +80,15 @@ const Weekly = () => {
   return (
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-primary mb-1">📊 דילמת השבוע</h1>
-        <p className="text-muted-foreground text-sm mb-6">הצבעה אנונימית – פעם אחת לסקר</p>
+        <div className="flex items-center gap-3 mb-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+            <ArrowRight className="h-5 w-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-primary">📊 דילמת השבוע</h1>
+            <p className="text-muted-foreground text-sm">הצבעה אנונימית – פעם אחת לסקר</p>
+          </div>
+        </div>
 
         <Card>
           <CardHeader>

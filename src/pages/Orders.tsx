@@ -98,9 +98,9 @@ const Orders = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
           {selected && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-xl">{selected.title_he}</DialogTitle>
-                <DialogDescription>סוג פקודה</DialogDescription>
+              <DialogHeader className="text-right pr-0 pl-10">
+                <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
+                <DialogDescription className="text-right text-xs">פקודה</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
