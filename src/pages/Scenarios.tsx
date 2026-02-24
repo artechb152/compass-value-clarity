@@ -160,7 +160,7 @@ const Scenarios = () => {
                 <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר—איזה ערך פה מתנגש לך בראש?</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
-                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-3 px-3 text-sm break-words whitespace-normal" onClick={() => setChosenIdx(i)}>
+                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal" onClick={() => setChosenIdx(i)}>
                       {c}
                     </Button>
                   ))}

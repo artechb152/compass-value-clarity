@@ -84,7 +84,6 @@ const Orders = () => {
                   <Icon className={`h-8 w-8 ${cfg.color}`} />
                   <div className="flex-1">
                     <CardTitle className="text-lg">{o.title_he}</CardTitle>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{o.official_definition_he?.slice(0, 80)}…</p>
                   </div>
                   {isViewed && <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />}
                 </CardHeader>
@@ -98,9 +97,9 @@ const Orders = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
           {selected && (
             <>
-              <DialogHeader className="text-right pr-0 pl-10">
+              <DialogHeader className="text-right pe-10 ps-0">
                 <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
-                <DialogDescription className="text-right text-xs">פקודה</DialogDescription>
+                <DialogDescription className="sr-only">פרטי פקודה</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
