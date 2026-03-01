@@ -37,8 +37,8 @@ const Scenarios = () => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
-  const [tensionMH, setTensionMH] = useState([50]);
-  const [tensionDR, setTensionDR] = useState([50]);
+  const [tensionMH, setTensionMH] = useState([5]);
+  const [tensionDR, setTensionDR] = useState([5]);
   const [reflection, setReflection] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -90,13 +90,14 @@ const Scenarios = () => {
 
   const handleSubmit = async () => {
     if (!user) return;
+    // Convert 1-10 scale to 0-100 for storage
     await supabase.from("responses").insert({
       user_id: user.id,
       scenario_id: scenario.id,
       choice: chosenIdx,
       selected_values_json: selectedValues,
-      tension_mission_human: tensionMH[0],
-      tension_discipline_responsibility: tensionDR[0],
+      tension_mission_human: tensionMH[0] * 10,
+      tension_discipline_responsibility: tensionDR[0] * 10,
       reflection_text: reflection,
     });
     setCompletedIds(prev => new Set([...prev, scenario.id]));
@@ -126,9 +127,9 @@ const Scenarios = () => {
       setCurrentIdx(nextIdx);
       resetState();
     } else if (scenarios.every(s => newCompleted.has(s.id))) {
+      // Only show completion after all 8 are done
       setShowCompletionDialog(true);
     } else {
-      // All remaining are completed, go to next anyway
       if (currentIdx < scenarios.length - 1) {
         setCurrentIdx((i) => i + 1);
         resetState();
@@ -139,8 +140,8 @@ const Scenarios = () => {
   const resetState = () => {
     setChosenIdx(null);
     setSelectedValues([]);
-    setTensionMH([50]);
-    setTensionDR([50]);
+    setTensionMH([5]);
+    setTensionDR([5]);
     setReflection("");
     setSubmitted(false);
   };
@@ -148,7 +149,6 @@ const Scenarios = () => {
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
   const progressPct = Math.round((completedCount / SCENARIOS_PER_USER) * 100);
 
-  // Build summary text for modal
   const choiceLabel = chosenIdx !== null ? choices[chosenIdx] : "";
   const valuesLabel = selectedValues.join(" ו-");
 
@@ -182,7 +182,6 @@ const Scenarios = () => {
               <p className="text-sm font-semibold text-primary mb-4">{dilemmaQuestion}</p>
             )}
 
-            {/* Show choices if not yet chosen and not already completed */}
             {chosenIdx === null && !completedIds.has(scenario.id) && (
               <>
                 <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר—איזה ערכים מתנגשים לך בראש?</p>
@@ -196,7 +195,6 @@ const Scenarios = () => {
               </>
             )}
 
-            {/* Already completed - show choices again for re-engagement */}
             {completedIds.has(scenario.id) && chosenIdx === null && (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground text-center">תרחיש זה הושלם. בחר שוב או המשך הלאה.</p>
@@ -213,7 +211,6 @@ const Scenarios = () => {
               </div>
             )}
 
-            {/* After choosing - show feedback + inputs */}
             {chosenIdx !== null && !submitted && (
               <div className="space-y-5 mt-4">
                 <div className="bg-muted/50 rounded-lg p-3">
@@ -244,14 +241,24 @@ const Scenarios = () => {
                       <span>משימה</span>
                       <span>כבוד האדם</span>
                     </div>
-                    <Slider value={tensionMH} onValueChange={setTensionMH} max={100} step={1} aria-label="מתח: משימה מול כבוד האדם" />
+                    <Slider value={tensionMH} onValueChange={setTensionMH} min={1} max={10} step={1} aria-label="מתח: משימה מול כבוד האדם" />
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <span key={i}>{i + 1}</span>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs text-muted-foreground mb-1">
                       <span>משמעת</span>
                       <span>אחריות אישית</span>
                     </div>
-                    <Slider value={tensionDR} onValueChange={setTensionDR} max={100} step={1} aria-label="מתח: משמעת מול אחריות אישית" />
+                    <Slider value={tensionDR} onValueChange={setTensionDR} min={1} max={10} step={1} aria-label="מתח: משמעת מול אחריות אישית" />
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <span key={i}>{i + 1}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -271,12 +278,12 @@ const Scenarios = () => {
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={setShowSummaryModal}>
-        <DialogContent className="max-w-sm" dir="rtl" role="dialog" aria-modal="true">
+        <DialogContent className="max-w-sm [direction:rtl]" dir="rtl" role="dialog" aria-modal="true">
           <DialogHeader className="text-right">
             <DialogTitle className="text-lg text-right">המשוב שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-sm text-right">
             <p>• <strong>בחרת:</strong> {choiceLabel}</p>
             <p>• <strong>ערכים שהתנגשו:</strong> {valuesLabel}</p>
             <p>• <strong>המדדים שלך:</strong> משימה↔כבוד האדם ({tensionMH[0]}), משמעת↔אחריות ({tensionDR[0]})</p>
@@ -293,10 +300,10 @@ const Scenarios = () => {
 
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
-        <DialogContent className="max-w-sm text-center" dir="rtl">
+        <DialogContent className="max-w-sm text-center [direction:rtl]" dir="rtl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">כל הכבוד!</DialogTitle>
-            <DialogDescription className="text-base mt-2">
+            <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
+            <DialogDescription className="text-base mt-2 text-right">
               סיימת את כל התכנים והדילמות בהצלחה. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי.
             </DialogDescription>
           </DialogHeader>
