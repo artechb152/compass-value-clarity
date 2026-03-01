@@ -52,15 +52,9 @@ const Orders = () => {
   };
 
   const handleCloseOrder = (open: boolean) => {
-    if (!open && miniChoice === null && selected) {
-      // User trying to close without answering mini scenario
-      setMiniScenarioError(true);
-      return;
-    }
     if (!open) {
       setSelected(null);
       setMiniScenarioError(false);
-      // Check if all orders completed, navigate home
       if (user) {
         const currentViewed = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
         if (currentViewed.length >= orders.length && orders.length > 0) {
