@@ -34,9 +34,21 @@ const Values = () => {
       const updated = [...viewedIds, v.id];
       setViewedIds(updated);
       localStorage.setItem(`viewed_values_${user.id}`, JSON.stringify(updated));
-      // Mark completed if all viewed
       if (updated.length >= values.length && values.length > 0) {
         supabase.from("progress").upsert({ user_id: user.id, module_key: "values", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+      }
+    }
+  };
+
+  const handleCloseValue = (open: boolean) => {
+    if (!open) {
+      setSelected(null);
+      // Check if all values completed, navigate home
+      if (user) {
+        const currentViewed = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
+        if (currentViewed.length >= values.length && values.length > 0) {
+          navigate("/");
+        }
       }
     }
   };
@@ -52,7 +64,6 @@ const Values = () => {
   return (
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
-        {/* Header with back button */}
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
             <ArrowRight className="h-5 w-5" />
@@ -63,7 +74,6 @@ const Values = () => {
           </div>
         </div>
 
-        {/* Progress bar */}
         <div className="flex items-center gap-3 mb-6">
           <Progress value={progressPct} className="h-2 flex-1" />
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{values.length}</span>
@@ -75,7 +85,7 @@ const Values = () => {
             return (
               <Card
                 key={v.id}
-                className={`cursor-pointer hover:shadow-md transition-all border-r-4 ${isViewed ? "border-r-green-500" : "border-r-primary/20"}`}
+                className={`cursor-pointer hover:shadow-md transition-all border-r-4 ${isViewed ? "border-r-success" : "border-r-primary/20"}`}
                 onClick={() => openValue(v)}
                 role="button"
                 tabIndex={0}
@@ -83,7 +93,7 @@ const Values = () => {
                 onKeyDown={(e) => e.key === "Enter" && openValue(v)}
               >
                 <div className="flex items-center gap-3 p-3">
-                  {isViewed && <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />}
+                  {isViewed && <CheckCircle className="h-5 w-5 text-success shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm">{v.title_he}</h3>
                     <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{v.official_definition_he}</p>
@@ -101,7 +111,7 @@ const Values = () => {
         )}
       </div>
 
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+      <Dialog open={!!selected} onOpenChange={handleCloseValue}>
         <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto p-4" dir="rtl">
           {selected && (
             <div className="space-y-3">
@@ -122,7 +132,7 @@ const Values = () => {
 
               {(selected as any).what_it_means_in_practice_he && (
                 <div className="bg-muted/50 rounded-lg p-3">
-                  <h3 className="font-semibold text-sm text-primary mb-1">💬 מה זה אומר בפועל?</h3>
+                  <h3 className="font-semibold text-sm text-primary mb-1">מה זה אומר בפועל?</h3>
                   <p className="text-sm">{(selected as any).what_it_means_in_practice_he}</p>
                 </div>
               )}

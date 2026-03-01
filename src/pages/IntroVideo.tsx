@@ -17,7 +17,6 @@ const IntroVideo = () => {
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
 
-  // Check if user is returning (same ID number, 2nd+ login)
   useEffect(() => {
     if (!user) return;
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
@@ -48,7 +47,6 @@ const IntroVideo = () => {
   const handleProceed = async () => {
     if (!user) return;
     await supabase.from("user_meta").upsert({ user_id: user.id, intro_video_completed: true });
-    // Mark intro as seen this session so Home won't redirect back
     sessionStorage.setItem(`intro_seen_this_session_${user.id}`, "1");
     navigate("/", { replace: true });
   };
@@ -63,8 +61,6 @@ const IntroVideo = () => {
     await supabase.from("user_dilemmas").delete().eq("user_id", user.id);
     setShowResumeDialog(false);
   };
-
-  
 
   if (checking) return <div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
@@ -130,7 +126,7 @@ const IntroVideo = () => {
               <PlayCircle className="h-4 w-4" />
               להמשיך מאיפה שעצרתי
             </Button>
-            <Button variant="outline" onClick={handleRestart} className="w-full gap-2">
+            <Button onClick={handleRestart} className="w-full gap-2">
               <RotateCcw className="h-4 w-4" />
               להתחיל מחדש
             </Button>

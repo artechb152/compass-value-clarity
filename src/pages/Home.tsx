@@ -26,7 +26,6 @@ const Home = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Always show intro screen on fresh session (no sessionStorage flag = new session)
     const introSeenKey = `intro_seen_this_session_${user.id}`;
     if (!sessionStorage.getItem(introSeenKey)) {
       setIntroCompleted(false);
@@ -55,7 +54,6 @@ const Home = () => {
 
       setProgressMap(map);
 
-      // Check if all modules complete
       const allDone = map.values.completed >= map.values.total &&
         map.orders.completed >= map.orders.total &&
         map.scenarios.completed >= map.scenarios.total &&
@@ -100,10 +98,11 @@ const Home = () => {
           {modules.map((mod, i) => {
             const prog = progressMap[mod.key] || { completed: 0, total: mod.total };
             const pct = Math.round((prog.completed / prog.total) * 100);
-            const label = prog.completed >= prog.total ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
+            const isDone = prog.completed >= prog.total;
+            const label = isDone ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
             return (
               <Link to={mod.to} key={mod.key}>
-                <Card className="hover:shadow-lg transition-shadow border-r-4 border-r-primary/30 mb-2">
+                <Card className={`hover:shadow-lg transition-shadow border-r-4 mb-2 ${isDone ? "border-r-success" : "border-r-primary/30"}`}>
                   <CardHeader className="pb-2 flex-row items-center gap-3">
                     <div className="bg-primary/10 p-2 rounded-lg">
                       <mod.icon className="h-6 w-6 text-primary" />
@@ -116,7 +115,7 @@ const Home = () => {
                   <CardContent>
                     <div className="flex items-center gap-3">
                       <Progress value={pct} className="h-2 flex-1" />
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">{label}</span>
+                      <span className={`text-xs whitespace-nowrap ${isDone ? "text-success font-medium" : "text-muted-foreground"}`}>{label}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -135,10 +134,10 @@ const Home = () => {
         </div>
 
         <Dialog open={showFinalCompletion} onOpenChange={setShowFinalCompletion}>
-          <DialogContent className="max-w-sm text-center [direction:rtl]" dir="rtl">
+          <DialogContent className="max-w-sm [direction:rtl]" dir="rtl">
             <DialogHeader>
-              <DialogTitle className="text-2xl">סיימת בהצלחה! 🎉</DialogTitle>
-              <DialogDescription className="text-base mt-2">
+              <DialogTitle className="text-2xl text-right">סיימת בהצלחה!</DialogTitle>
+              <DialogDescription className="text-base mt-2 text-right">
                 עברת את כל התכנים — ערכים, פקודות, דילמות ודילמת השבוע. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי בשטח.
               </DialogDescription>
             </DialogHeader>

@@ -26,6 +26,7 @@ const Orders = () => {
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
+  const [miniScenarioError, setMiniScenarioError] = useState(false);
 
   useEffect(() => {
     supabase.from("orders").select("*").then(({ data }) => data && setOrders(data));
@@ -39,12 +40,32 @@ const Orders = () => {
   const openOrder = (o: Tables<"orders">) => {
     setSelected(o);
     setMiniChoice(null);
+    setMiniScenarioError(false);
     if (user && !viewedIds.includes(o.id)) {
       const updated = [...viewedIds, o.id];
       setViewedIds(updated);
       localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updated));
       if (updated.length >= orders.length && orders.length > 0) {
         supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+      }
+    }
+  };
+
+  const handleCloseOrder = (open: boolean) => {
+    if (!open && miniChoice === null && selected) {
+      // User trying to close without answering mini scenario
+      setMiniScenarioError(true);
+      return;
+    }
+    if (!open) {
+      setSelected(null);
+      setMiniScenarioError(false);
+      // Check if all orders completed, navigate home
+      if (user) {
+        const currentViewed = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
+        if (currentViewed.length >= orders.length && orders.length > 0) {
+          navigate("/");
+        }
       }
     }
   };
@@ -77,7 +98,7 @@ const Orders = () => {
             return (
               <Card
                 key={o.id}
-                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isViewed ? "ring-2 ring-green-500/30" : ""}`}
+                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isViewed ? "ring-2 ring-success/30" : ""}`}
                 onClick={() => openOrder(o)}
                 role="button"
                 tabIndex={0}
@@ -88,7 +109,7 @@ const Orders = () => {
                   <div className="flex-1">
                     <CardTitle className="text-lg">{o.title_he}</CardTitle>
                   </div>
-                  {isViewed && <CheckCircle className="h-5 w-5 text-green-500 shrink-0" />}
+                  {isViewed && <CheckCircle className="h-5 w-5 text-success shrink-0" />}
                 </CardHeader>
               </Card>
             );
@@ -96,7 +117,7 @@ const Orders = () => {
         </div>
       </div>
 
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+      <Dialog open={!!selected} onOpenChange={handleCloseOrder}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
           {selected && (
             <>
@@ -117,7 +138,7 @@ const Orders = () => {
                 </div>
 
                 <div className="bg-destructive/5 rounded-lg p-3" dir="rtl">
-                  <h3 className="font-semibold text-sm text-destructive mb-2">🚩 דגל אדום</h3>
+                  <h3 className="font-semibold text-sm text-destructive mb-2">דגל אדום</h3>
                   <ul className="space-y-1">
                     {(selected.red_flags_json as string[] || []).map((flag, i) => (
                       <li key={i} className="text-sm flex items-start gap-2" style={{ direction: "rtl" }}>
@@ -129,7 +150,7 @@ const Orders = () => {
                 </div>
 
                 <div className="bg-muted/50 rounded-lg p-3">
-                  <h3 className="font-semibold text-sm text-primary mb-2">✅ מה עושים?</h3>
+                  <h3 className="font-semibold text-sm text-primary mb-2">מה עושים?</h3>
                   <ol className="space-y-1">
                     {(selected.what_to_do_steps_json as string[] || []).map((step, i) => (
                       <li key={i} className="text-sm flex items-start gap-2">
@@ -139,9 +160,12 @@ const Orders = () => {
                   </ol>
                 </div>
 
-                <div className="bg-accent/10 rounded-lg p-3">
-                  <h3 className="font-semibold text-sm text-primary mb-2">🎯 מיני-תרחיש</h3>
+                <div className={`rounded-lg p-3 transition-all ${miniScenarioError && miniChoice === null ? "bg-destructive/10 ring-2 ring-destructive" : "bg-accent/10"}`}>
+                  <h3 className="font-semibold text-sm text-primary mb-2">מיני-תרחיש</h3>
                   <p className="text-sm mb-3">{selected.mini_scenario_he}</p>
+                  {miniScenarioError && miniChoice === null && (
+                    <p className="text-xs text-destructive mb-2 font-medium">יש לענות על המיני-תרחיש לפני סגירה</p>
+                  )}
                   <div className="space-y-2">
                     {(selected.mini_choices_json as string[] || []).map((choice, i) => (
                       <Button
@@ -150,6 +174,7 @@ const Orders = () => {
                         className="w-full text-right justify-start h-auto py-2 px-3"
                         onClick={() => {
                           setMiniChoice(i);
+                          setMiniScenarioError(false);
                           const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
                           if (feedbacks) {
                             const fb = feedbacks.find(f => f.choice_index === i);
@@ -163,8 +188,6 @@ const Orders = () => {
                   </div>
                 </div>
               </div>
-
-              
             </>
           )}
         </DialogContent>
