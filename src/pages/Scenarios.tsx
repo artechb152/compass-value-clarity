@@ -115,25 +115,11 @@ const Scenarios = () => {
   const goNext = () => {
     setShowSummaryModal(false);
     const newCompleted = new Set([...completedIds, scenario.id]);
-    // Find next uncompleted scenario
-    let nextIdx = -1;
-    for (let i = currentIdx + 1; i < scenarios.length; i++) {
-      if (!newCompleted.has(scenarios[i].id)) {
-        nextIdx = i;
-        break;
-      }
-    }
-    if (nextIdx !== -1) {
-      setCurrentIdx(nextIdx);
+    if (currentIdx < scenarios.length - 1) {
+      setCurrentIdx(currentIdx + 1);
       resetState();
     } else if (scenarios.every(s => newCompleted.has(s.id))) {
-      // Only show completion after all 8 are done
       setShowCompletionDialog(true);
-    } else {
-      if (currentIdx < scenarios.length - 1) {
-        setCurrentIdx((i) => i + 1);
-        resetState();
-      }
     }
   };
 
@@ -156,7 +142,7 @@ const Scenarios = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="outline" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
