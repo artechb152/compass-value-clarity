@@ -125,18 +125,15 @@ const Scenarios = () => {
 
   const goNext = () => {
     setShowSummaryModal(false);
+    // Check if all 8 are done
+    const allDone = scenarios.every(s => completedIds.has(s.id));
+    if (allDone) {
+      setShowCompletionDialog(true);
+      return;
+    }
     if (currentIdx !== null && currentIdx < scenarios.length - 1) {
       setCurrentIdx(currentIdx + 1);
       resetState();
-    } else {
-      // Check if all done using latest completedIds
-      setCompletedIds(prev => {
-        const allDone = scenarios.every(s => prev.has(s.id));
-        if (allDone) {
-          setShowCompletionDialog(true);
-        }
-        return prev;
-      });
     }
   };
 
