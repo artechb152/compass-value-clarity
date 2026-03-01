@@ -121,7 +121,7 @@ const IntroVideo = () => {
 
       <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
         <DialogContent className="max-w-sm" dir="rtl">
-          <DialogHeader className="text-right">
+          <DialogHeader className="text-right pt-4">
             <DialogTitle className="text-right">ברוך השב!</DialogTitle>
             <DialogDescription className="text-right">יש לך התקדמות קודמת. מה תרצה לעשות?</DialogDescription>
           </DialogHeader>
