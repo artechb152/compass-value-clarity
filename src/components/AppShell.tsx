@@ -24,7 +24,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       {/* Header */}
       <header className="bg-primary text-primary-foreground px-4 py-2 flex items-center justify-between sticky top-0 z-40 shadow-md">
         <button onClick={() => navigate("/")} className="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="חזרה למסך הבית">
-          <Home className="h-5 w-5" />
           <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-8 w-auto" />
         </button>
         <div className="flex items-center gap-1">

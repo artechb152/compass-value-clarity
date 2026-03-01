@@ -156,7 +156,7 @@ const Scenarios = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="default" size="icon" onClick={() => navigate("/")} className="shrink-0">
+          <Button variant="outline" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
@@ -187,7 +187,7 @@ const Scenarios = () => {
                 <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר—איזה ערכים מתנגשים לך בראש?</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
-                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal" onClick={() => setChosenIdx(i)}>
+                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground" onClick={() => setChosenIdx(i)}>
                       {c}
                     </Button>
                   ))}
@@ -200,7 +200,7 @@ const Scenarios = () => {
                 <p className="text-sm text-muted-foreground text-center">תרחיש זה הושלם. בחר שוב או המשך הלאה.</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
-                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal" onClick={() => setChosenIdx(i)}>
+                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground" onClick={() => setChosenIdx(i)}>
                       {c}
                     </Button>
                   ))}
@@ -267,7 +267,7 @@ const Scenarios = () => {
                   <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} />
                 </div>
 
-                <Button onClick={handleSubmit} className="w-full" disabled={!canShowSummary}>
+                <Button variant="outline" onClick={handleSubmit} className="w-full hover:bg-primary hover:text-primary-foreground" disabled={!canShowSummary}>
                   סיכום והמשך
                 </Button>
               </div>
