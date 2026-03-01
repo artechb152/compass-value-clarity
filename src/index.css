@@ -97,7 +97,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-to-b from-primary/10 via-primary/5 to-background text-foreground min-h-screen;
+    @apply bg-secondary text-foreground min-h-screen;
   }
   html {
     direction: rtl;
