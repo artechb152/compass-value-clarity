@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, BookOpen, Shield, FlaskConical, MessageCircleQuestion, Settings, LogOut, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import ruachLogo from "@/assets/ruach-tzahal.png";
+import ruachWhiteLogo from "@/assets/ruach-tzahal-white.png";
 
 const navItems = [
   { to: "/", icon: Home, label: "מסלול" },
@@ -24,11 +24,8 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
       {/* Header */}
       <header className="bg-primary text-primary-foreground px-4 py-2 flex items-center justify-between sticky top-0 z-40 shadow-md">
         <button onClick={() => navigate("/")} className="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="חזרה למסך הבית">
-          <img src={ruachLogo} alt="רוח צה״ל" className="h-10 w-auto" />
-          <div className="flex flex-col leading-tight">
-            <span className="text-lg font-bold">רוח צה״ל</span>
-            <span className="text-[10px] opacity-80">התנגשות בין ערכים</span>
-          </div>
+          <Home className="h-5 w-5" />
+          <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-8 w-auto" />
         </button>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="text-primary-foreground hover:bg-primary/80 transition-transform hover:scale-110" aria-label="החלף מצב תצוגה">

@@ -86,7 +86,7 @@ const Scenarios = () => {
     setSelectedValues((prev) => prev.includes(v) ? prev.filter((x) => x !== v) : prev.length < 2 ? [...prev, v] : prev);
   };
 
-  const canShowSummary = chosenIdx !== null && selectedValues.length === 2 && reflection.trim().length >= 5;
+  const canShowSummary = chosenIdx !== null && selectedValues.length === 2 && reflection.trim().length >= 1;
 
   const handleSubmit = async () => {
     if (!user) return;
@@ -156,7 +156,7 @@ const Scenarios = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+          <Button variant="default" size="icon" onClick={() => navigate("/")} className="shrink-0">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
@@ -242,7 +242,7 @@ const Scenarios = () => {
                       <span>כבוד האדם</span>
                     </div>
                     <Slider value={tensionMH} onValueChange={setTensionMH} min={1} max={10} step={1} aria-label="מתח: משימה מול כבוד האדם" />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
                       {Array.from({ length: 10 }, (_, i) => (
                         <span key={i}>{i + 1}</span>
                       ))}
@@ -254,7 +254,7 @@ const Scenarios = () => {
                       <span>אחריות אישית</span>
                     </div>
                     <Slider value={tensionDR} onValueChange={setTensionDR} min={1} max={10} step={1} aria-label="מתח: משמעת מול אחריות אישית" />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
                       {Array.from({ length: 10 }, (_, i) => (
                         <span key={i}>{i + 1}</span>
                       ))}
