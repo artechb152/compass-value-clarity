@@ -20,13 +20,9 @@ const IntroVideo = () => {
   // Check if user is returning (same ID number, 2nd+ login)
   useEffect(() => {
     if (!user) return;
-    const isReturning = sessionStorage.getItem("is_returning_user") === "true";
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (data?.intro_video_completed) {
         setIsReturningUser(true);
-      }
-      // Show resume dialog only for returning users (2nd+ login with same ID)
-      if (isReturning && data?.intro_video_completed) {
         const resumeShownKey = `resume_shown_${user.id}`;
         if (!sessionStorage.getItem(resumeShownKey)) {
           setShowResumeDialog(true);
@@ -35,9 +31,7 @@ const IntroVideo = () => {
       }
       setChecking(false);
     });
-    // Clear the flag so it doesn't persist across manual navigations
-    sessionStorage.removeItem("is_returning_user");
-  }, [user, navigate]);
+  }, [user]);
 
   useEffect(() => {
     if (checking) return;
