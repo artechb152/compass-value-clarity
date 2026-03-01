@@ -100,26 +100,29 @@ const Scenarios = () => {
       tension_discipline_responsibility: tensionDR[0] * 10,
       reflection_text: reflection,
     });
-    const newCompleted = new Set([...completedIds, scenario.id]);
-    setCompletedIds(newCompleted);
+    setCompletedIds(prev => {
+      const newCompleted = new Set([...prev, scenario.id]);
+      const allDone = scenarios.every(s => newCompleted.has(s.id));
+      if (allDone) {
+        supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+      }
+      return newCompleted;
+    });
     setSubmitted(true);
     setShowSummaryModal(true);
     toast.success("התשובה נשמרה!");
-
-    const allDone = scenarios.every(s => newCompleted.has(s.id));
-    if (allDone) {
-      supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
-    }
   };
 
   const goNext = () => {
     setShowSummaryModal(false);
-    const newCompleted = new Set([...completedIds, scenario.id]);
     if (currentIdx < scenarios.length - 1) {
-      setCurrentIdx(currentIdx + 1);
+      setCurrentIdx(prev => prev + 1);
       resetState();
-    } else if (scenarios.every(s => newCompleted.has(s.id))) {
-      setShowCompletionDialog(true);
+    } else {
+      const allDone = scenarios.every(s => completedIds.has(s.id));
+      if (allDone) {
+        setShowCompletionDialog(true);
+      }
     }
   };
 
