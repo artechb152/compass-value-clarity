@@ -113,13 +113,25 @@ const Scenarios = () => {
 
   const goNext = () => {
     setShowSummaryModal(false);
-    if (currentIdx < scenarios.length - 1) {
-      setCurrentIdx((i) => i + 1);
+    const newCompleted = new Set([...completedIds, scenario.id]);
+    // Find next uncompleted scenario
+    let nextIdx = -1;
+    for (let i = currentIdx + 1; i < scenarios.length; i++) {
+      if (!newCompleted.has(scenarios[i].id)) {
+        nextIdx = i;
+        break;
+      }
+    }
+    if (nextIdx !== -1) {
+      setCurrentIdx(nextIdx);
       resetState();
+    } else if (scenarios.every(s => newCompleted.has(s.id))) {
+      setShowCompletionDialog(true);
     } else {
-      const newCompleted = new Set([...completedIds, scenario.id]);
-      if (scenarios.every(s => newCompleted.has(s.id))) {
-        setShowCompletionDialog(true);
+      // All remaining are completed, go to next anyway
+      if (currentIdx < scenarios.length - 1) {
+        setCurrentIdx((i) => i + 1);
+        resetState();
       }
     }
   };
@@ -184,11 +196,19 @@ const Scenarios = () => {
               </>
             )}
 
-            {/* Already completed - just show next button */}
+            {/* Already completed - show choices again for re-engagement */}
             {completedIds.has(scenario.id) && chosenIdx === null && (
-              <div className="text-center py-4">
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground text-center">תרחיש זה הושלם. בחר שוב או המשך הלאה.</p>
+                <div className="space-y-2">
+                  {choices.map((c, i) => (
+                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal" onClick={() => setChosenIdx(i)}>
+                      {c}
+                    </Button>
+                  ))}
+                </div>
                 {currentIdx < scenarios.length - 1 && (
-                  <Button onClick={goNext}>ממשיכים לתרחיש הבא →</Button>
+                  <Button variant="secondary" onClick={goNext} className="w-full">ממשיכים לתרחיש הבא →</Button>
                 )}
               </div>
             )}
@@ -252,7 +272,7 @@ const Scenarios = () => {
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={setShowSummaryModal}>
         <DialogContent className="max-w-sm" dir="rtl" role="dialog" aria-modal="true">
-          <DialogHeader className="text-right pe-10 ps-0">
+          <DialogHeader className="text-right">
             <DialogTitle className="text-lg text-right">המשוב שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
           </DialogHeader>
@@ -262,7 +282,7 @@ const Scenarios = () => {
             <p>• <strong>המדדים שלך:</strong> משימה↔כבוד האדם ({tensionMH[0]}), משמעת↔אחריות ({tensionDR[0]})</p>
             {reflection && <p>• <strong>השורה שלך:</strong> "{reflection}"</p>}
             {closingFeedback?.summary_text && (
-              <p className="text-muted-foreground mt-2">{closingFeedback.summary_text}</p>
+              <p className="font-semibold text-primary mt-2">{closingFeedback.summary_text}</p>
             )}
           </div>
           <Button onClick={goNext} className="w-full mt-2">

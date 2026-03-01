@@ -100,7 +100,7 @@ const Orders = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
           {selected && (
             <>
-              <DialogHeader className="text-right pe-10 ps-0">
+              <DialogHeader className="text-right">
                 <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
                 <DialogDescription className="sr-only">פרטי פקודה</DialogDescription>
               </DialogHeader>
@@ -174,7 +174,7 @@ const Orders = () => {
         <DialogContent className="max-w-sm" dir="rtl" role="dialog" aria-modal="true">
           {feedbackModal && (
             <>
-              <DialogHeader className="text-right pe-10 ps-0">
+              <DialogHeader className="text-right">
                 <DialogTitle className="text-lg text-right">{feedbackModal.title}</DialogTitle>
                 <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
               </DialogHeader>
