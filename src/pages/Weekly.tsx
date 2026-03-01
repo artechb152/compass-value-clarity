@@ -71,9 +71,10 @@ const Weekly = () => {
     const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: poll.id });
     if (res) setResults(res as any);
     // Auto-redirect to home after a short delay so completion popup can trigger
+    // Clear the final completion flag so it shows after weekly is done
+    if (user) sessionStorage.removeItem(`final_completion_shown_${user.id}`);
     setTimeout(() => {
       navigate("/");
-      // Force reload progress on home to trigger completion popup
       window.location.reload();
     }, 2000);
   };
