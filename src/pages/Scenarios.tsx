@@ -299,8 +299,8 @@ const Scenarios = () => {
       </Dialog>
 
       {/* Completion Dialog */}
-      <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
-        <DialogContent className="max-w-sm text-center [direction:rtl]" dir="rtl">
+      <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
+        <DialogContent className="max-w-sm text-center [direction:rtl] [&>button:last-child]:hidden" dir="rtl">
           <DialogHeader>
             <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
             <DialogDescription className="text-base mt-2 text-right">
@@ -309,7 +309,7 @@ const Scenarios = () => {
           </DialogHeader>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
           <Button onClick={() => navigate("/")} className="w-full" size="lg">
-            חזרה למסך הראשי
+            סגירה
           </Button>
         </DialogContent>
       </Dialog>
