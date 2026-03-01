@@ -76,7 +76,7 @@ const Orders = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+          <Button variant="default" size="icon" onClick={() => navigate("/")} className="shrink-0">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
