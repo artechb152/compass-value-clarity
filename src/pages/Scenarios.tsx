@@ -280,7 +280,7 @@ const Scenarios = () => {
       </div>
 
       {/* Summary Modal */}
-      <Dialog open={showSummaryModal} onOpenChange={setShowSummaryModal}>
+      <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
         <DialogContent className="max-w-sm [direction:rtl]" dir="rtl" role="dialog" aria-modal="true">
           <DialogHeader className="text-right">
             <DialogTitle className="text-lg text-right">המשוב שלך</DialogTitle>
