@@ -135,7 +135,7 @@ const Home = () => {
         </div>
 
         <Dialog open={showFinalCompletion} onOpenChange={setShowFinalCompletion}>
-          <DialogContent className="max-w-sm text-center" dir="rtl">
+          <DialogContent className="max-w-sm text-center [direction:rtl]" dir="rtl">
             <DialogHeader>
               <DialogTitle className="text-2xl">סיימת בהצלחה! 🎉</DialogTitle>
               <DialogDescription className="text-base mt-2">
