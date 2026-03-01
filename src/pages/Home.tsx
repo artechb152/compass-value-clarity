@@ -143,7 +143,7 @@ const Home = () => {
             </DialogHeader>
             <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
             <Button onClick={() => setShowFinalCompletion(false)} className="w-full" size="lg">
-              מעולה!
+              סגירה
             </Button>
           </DialogContent>
         </Dialog>
