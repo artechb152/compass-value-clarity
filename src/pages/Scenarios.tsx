@@ -300,17 +300,14 @@ const Scenarios = () => {
 
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
-        <DialogContent className="max-w-sm text-center [direction:rtl] [&>button:last-child]:hidden" dir="rtl">
+        <DialogContent className="max-w-sm text-center [direction:rtl]" dir="rtl">
           <DialogHeader>
             <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
             <DialogDescription className="text-base mt-2 text-right">
-              סיימת את כל התכנים והדילמות בהצלחה. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי.
+              סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
             </DialogDescription>
           </DialogHeader>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
-          <Button onClick={() => navigate("/")} className="w-full" size="lg">
-            סגירה
-          </Button>
         </DialogContent>
       </Dialog>
     </AppShell>

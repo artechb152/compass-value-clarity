@@ -59,7 +59,11 @@ const Home = () => {
         map.scenarios.completed >= map.scenarios.total &&
         map.weekly.completed >= map.weekly.total;
       if (allDone) {
-        setShowFinalCompletion(true);
+        const finalShownKey = `final_completion_shown_${user.id}`;
+        if (!sessionStorage.getItem(finalShownKey)) {
+          setShowFinalCompletion(true);
+          sessionStorage.setItem(finalShownKey, "1");
+        }
       }
     };
     loadProgress();
