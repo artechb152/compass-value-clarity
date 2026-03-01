@@ -23,11 +23,7 @@ const IntroVideo = () => {
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (data?.intro_video_completed) {
         setIsReturningUser(true);
-        const resumeShownKey = `resume_shown_${user.id}`;
-        if (!sessionStorage.getItem(resumeShownKey)) {
-          setShowResumeDialog(true);
-          sessionStorage.setItem(resumeShownKey, "1");
-        }
+        setShowResumeDialog(true);
       }
       setChecking(false);
     });
