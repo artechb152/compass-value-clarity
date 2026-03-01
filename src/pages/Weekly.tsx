@@ -70,6 +70,8 @@ const Weekly = () => {
     toast.success("ההצבעה נשמרה!");
     const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: poll.id });
     if (res) setResults(res as any);
+    // Auto-redirect to home after a short delay
+    setTimeout(() => navigate("/"), 2000);
   };
 
   if (!poll) return <AppShell><div className="p-4 text-center text-muted-foreground">אין סקר שבועי כרגע</div></AppShell>;
@@ -81,7 +83,7 @@ const Weekly = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
