@@ -59,7 +59,7 @@ const Values = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-primary">רוח צה״ל – הערכים</h1>
-            <p className="text-muted-foreground text-sm">11 ערכי יסוד. לחצ/י על ערך כדי ללמוד ולתרגל.</p>
+            <p className="text-muted-foreground text-sm">11 ערכי יסוד. לחץ על ערך כדי ללמוד ולתרגל.</p>
           </div>
         </div>
 
