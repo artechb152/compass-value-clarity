@@ -117,7 +117,7 @@ const Orders = () => {
                 </div>
 
                 <div className="bg-destructive/5 rounded-lg p-3" dir="rtl">
-                  <h3 className="font-semibold text-sm text-destructive mb-2">🚩 Red Flags</h3>
+                  <h3 className="font-semibold text-sm text-destructive mb-2">🚩 דגל אדום</h3>
                   <ul className="space-y-1">
                     {(selected.red_flags_json as string[] || []).map((flag, i) => (
                       <li key={i} className="text-sm flex items-start gap-2" style={{ direction: "rtl" }}>

@@ -108,7 +108,7 @@ const IntroVideo = () => {
             רוח צה״ל היא תעודת הזהות הערכית של צה״ל, אשר ראוי שתעמוד ביסוד הפעולות של כל חייל וחיילת במסגרת צה״ל, בשירות סדיר ובשירות מילואים. רוח צה״ל וכללי הפעולה הנגזרים ממנו הם הקוד האתי של צה״ל.
           </p>
           <p className="text-sm leading-relaxed text-foreground/80">
-            <strong>במילים פשוטות:</strong> רוח צה״ל היא המצפן הערכי שמכוון איך פועלים בצבא—לא רק מה עושים, אלא גם איך עושים. היא עוזרת לקבל החלטות בשגרה וגם ברגעי לחץ, אי־ודאות או דילמות, ומזכירה לנו לשלב בין ביצוע משימה לבין אחריות, מקצועיות וכבוד האדם. לכן לאורך הקורס נתרגל מצבים שבהם ערכים מתנגשים, נבחן אפשרויות פעולה שונות, ונלמד לשאול את השאלות הנכונות לפני שמחליטים.
+            רוח צה״ל היא המצפן הערכי שמכוון איך פועלים בצבא—לא רק מה עושים, אלא גם איך עושים. היא עוזרת לקבל החלטות בשגרה וגם ברגעי לחץ, אי־ודאות או דילמות, ומזכירה לנו לשלב בין ביצוע משימה לבין אחריות, מקצועיות וכבוד האדם. לכן לאורך הקורס נתרגל מצבים שבהם ערכים מתנגשים, נבחן אפשרויות פעולה שונות, ונלמד לשאול את השאלות הנכונות לפני שמחליטים.
           </p>
           <p className="text-sm leading-relaxed text-foreground/80">
             רוח צה״ל נשענת על ארבעה מקורות מרכזיים: מסורת צה״ל ומורשת הלחימה שלו; מסורת מדינת ישראל (הדמוקרטיה, החוקים והמוסדות שלה); מסורת העם היהודי; וערכי מוסר אוניברסליים המבוססים על ערך האדם וכבודו.
@@ -131,9 +131,9 @@ const IntroVideo = () => {
 
       <Dialog open={showResumeDialog} onOpenChange={setShowResumeDialog}>
         <DialogContent className="max-w-sm" dir="rtl">
-          <DialogHeader className="text-right">
-            <DialogTitle className="text-right">ברוך/ה השב/ה!</DialogTitle>
-            <DialogDescription className="text-right">יש לך התקדמות קודמת. מה תרצה/י לעשות?</DialogDescription>
+          <DialogHeader className="text-right pe-10 ps-0">
+            <DialogTitle className="text-right">ברוך השב!</DialogTitle>
+            <DialogDescription className="text-right">יש לך התקדמות קודמת. מה תרצה לעשות?</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-2">
             <Button onClick={() => { setShowResumeDialog(false); sessionStorage.setItem(`intro_seen_this_session_${user?.id}`, "1"); navigate("/", { replace: true }); }} className="w-full gap-2">

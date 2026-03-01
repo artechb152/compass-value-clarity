@@ -147,7 +147,11 @@ export type Database = {
       }
       scenarios: {
         Row: {
+          choice_rationale_json: Json | null
           choices_json: Json | null
+          closing_feedback_json: Json | null
+          context_he: string | null
+          dilemma_question_he: string | null
           feedback_json: Json | null
           id: string
           reflection_question_he: string | null
@@ -157,7 +161,11 @@ export type Database = {
           value_conflicts_json: Json | null
         }
         Insert: {
+          choice_rationale_json?: Json | null
           choices_json?: Json | null
+          closing_feedback_json?: Json | null
+          context_he?: string | null
+          dilemma_question_he?: string | null
           feedback_json?: Json | null
           id: string
           reflection_question_he?: string | null
@@ -167,7 +175,11 @@ export type Database = {
           value_conflicts_json?: Json | null
         }
         Update: {
+          choice_rationale_json?: Json | null
           choices_json?: Json | null
+          closing_feedback_json?: Json | null
+          context_he?: string | null
+          dilemma_question_he?: string | null
           feedback_json?: Json | null
           id?: string
           reflection_question_he?: string | null
