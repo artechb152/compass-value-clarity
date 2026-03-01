@@ -100,12 +100,12 @@ const Scenarios = () => {
       tension_discipline_responsibility: tensionDR[0] * 10,
       reflection_text: reflection,
     });
-    setCompletedIds(prev => new Set([...prev, scenario.id]));
+    const newCompleted = new Set([...completedIds, scenario.id]);
+    setCompletedIds(newCompleted);
     setSubmitted(true);
     setShowSummaryModal(true);
     toast.success("התשובה נשמרה!");
 
-    const newCompleted = new Set([...completedIds, scenario.id]);
     const allDone = scenarios.every(s => newCompleted.has(s.id));
     if (allDone) {
       supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });

@@ -70,8 +70,12 @@ const Weekly = () => {
     toast.success("ההצבעה נשמרה!");
     const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: poll.id });
     if (res) setResults(res as any);
-    // Auto-redirect to home after a short delay
-    setTimeout(() => navigate("/"), 2000);
+    // Auto-redirect to home after a short delay so completion popup can trigger
+    setTimeout(() => {
+      navigate("/");
+      // Force reload progress on home to trigger completion popup
+      window.location.reload();
+    }, 2000);
   };
 
   if (!poll) return <AppShell><div className="p-4 text-center text-muted-foreground">אין סקר שבועי כרגע</div></AppShell>;
