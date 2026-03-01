@@ -34,7 +34,8 @@ const Scenarios = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [allScenarios, setAllScenarios] = useState<Tables<"scenarios">[]>([]);
-  const [currentIdx, setCurrentIdx] = useState(0);
+  const [currentIdx, setCurrentIdx] = useState<number | null>(null);
+  const [initialIdxSet, setInitialIdxSet] = useState(false);
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [tensionMH, setTensionMH] = useState([5]);
@@ -65,14 +66,23 @@ const Scenarios = () => {
   }, [allScenarios, user]);
 
   useEffect(() => {
-    if (scenarios.length === 0 || completedIds.size === 0) return;
-    const firstIncomplete = scenarios.findIndex(s => !completedIds.has(s.id));
-    if (firstIncomplete > 0) {
-      setCurrentIdx(firstIncomplete);
+    if (initialIdxSet || scenarios.length === 0) return;
+    if (completedIds.size === 0 && allScenarios.length > 0) {
+      // DB load returned no completed - start at 0
+      setCurrentIdx(0);
+      setInitialIdxSet(true);
+      return;
     }
-  }, [scenarios, completedIds]);
+    const firstIncomplete = scenarios.findIndex(s => !completedIds.has(s.id));
+    if (firstIncomplete >= 0) {
+      setCurrentIdx(firstIncomplete);
+    } else {
+      setCurrentIdx(0); // all done, show first
+    }
+    setInitialIdxSet(true);
+  }, [scenarios, completedIds, initialIdxSet, allScenarios.length]);
 
-  const scenario = scenarios[currentIdx];
+  const scenario = currentIdx !== null ? scenarios[currentIdx] : null;
   if (!scenario) return <AppShell><div className="p-4 text-center text-muted-foreground">טוען תרחישים...</div></AppShell>;
 
   const choices = (scenario.choices_json as string[]) || [];
@@ -115,14 +125,18 @@ const Scenarios = () => {
 
   const goNext = () => {
     setShowSummaryModal(false);
-    if (currentIdx < scenarios.length - 1) {
-      setCurrentIdx(prev => prev + 1);
+    if (currentIdx !== null && currentIdx < scenarios.length - 1) {
+      setCurrentIdx(currentIdx + 1);
       resetState();
     } else {
-      const allDone = scenarios.every(s => completedIds.has(s.id));
-      if (allDone) {
-        setShowCompletionDialog(true);
-      }
+      // Check if all done using latest completedIds
+      setCompletedIds(prev => {
+        const allDone = scenarios.every(s => prev.has(s.id));
+        if (allDone) {
+          setShowCompletionDialog(true);
+        }
+        return prev;
+      });
     }
   };
 
