@@ -53,6 +53,11 @@ const Orders = () => {
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
+      // Block closing if mini-scenario not answered
+      if (selected && miniChoice === null) {
+        setMiniScenarioError(true);
+        return;
+      }
       setSelected(null);
       setMiniScenarioError(false);
       if (user) {

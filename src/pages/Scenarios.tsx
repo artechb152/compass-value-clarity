@@ -183,7 +183,7 @@ const Scenarios = () => {
 
             {chosenIdx === null && !completedIds.has(scenario.id) && (
               <>
-                <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר – איזה ערכים מתנגשים לך בראש?</p>
+                <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר ‑ איזה ערכים מתנגשים לך בראש?</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
                     <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground" onClick={() => setChosenIdx(i)}>
@@ -261,7 +261,7 @@ const Scenarios = () => {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium mb-1">משפט אחד לעצמך – מה אתה לוקח מהסיטואציה?</p>
+                  <p className="text-sm font-medium mb-1">משפט אחד לעצמך ‑ מה אתה לוקח מהסיטואציה?</p>
                   <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} />
                 </div>
 
@@ -283,8 +283,8 @@ const Scenarios = () => {
           </DialogHeader>
           <div className="space-y-3 text-sm text-right">
             <p>• <strong>בחרת:</strong> {choiceLabel}</p>
-            <p>• <strong>ערכים שהתנגשו:</strong> {valuesLabel}</p>
-            <p>• <strong>המדדים שלך:</strong> משימה–כבוד האדם ({tensionMH[0]}), משמעת–אחריות ({tensionDR[0]})</p>
+            <p>• <strong>ערכים שהתנגשו:</strong> {selectedValues.join(" ו‑")}</p>
+            <p>• <strong>המדדים שלך:</strong> משימה‑כבוד האדם ({tensionMH[0]}), משמעת‑אחריות ({tensionDR[0]})</p>
             {reflection && <p>• <strong>השורה שלך:</strong> "{reflection}"</p>}
             {closingFeedback?.summary_text && (
               <p className="font-semibold text-primary mt-2">{closingFeedback.summary_text}</p>
@@ -306,6 +306,9 @@ const Scenarios = () => {
             </DialogDescription>
           </DialogHeader>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
+          <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full" size="lg">
+            חזרה למסך הבית
+          </Button>
         </DialogContent>
       </Dialog>
     </AppShell>
