@@ -1,21 +1,13 @@
+import { Progress } from "@/components/ui/progress";
+
 interface SegmentedProgressProps {
   completed: number;
   total: number;
 }
 
 const SegmentedProgress = ({ completed, total }: SegmentedProgressProps) => {
-  return (
-    <div className="flex gap-1 flex-1" dir="ltr">
-      {Array.from({ length: total }, (_, i) => (
-        <div
-          key={i}
-          className={`h-2 flex-1 rounded-full transition-colors ${
-            i < completed ? "bg-success" : "bg-muted"
-          }`}
-        />
-      ))}
-    </div>
-  );
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  return <Progress value={pct} className="h-2 flex-1" />;
 };
 
 export default SegmentedProgress;
