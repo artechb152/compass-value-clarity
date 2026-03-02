@@ -11,13 +11,10 @@ import { toast } from "sonner";
 import { ArrowRight, Trophy } from "lucide-react";
 import type { Tables, Json } from "@/integrations/supabase/types";
 
-// Get current ISO week key
-function getCurrentWeekKey(): string {
+// Get current day key for daily rotation
+function getCurrentDayKey(): string {
   const now = new Date();
-  const jan1 = new Date(now.getFullYear(), 0, 1);
-  const days = Math.floor((now.getTime() - jan1.getTime()) / 86400000);
-  const week = Math.ceil((days + jan1.getDay() + 1) / 7);
-  return `${now.getFullYear()}-W${String(week).padStart(2, "0")}`;
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
 // Deterministic hash to pick a poll for a user+week combo
@@ -44,10 +41,10 @@ const Weekly = () => {
       const { data: allPolls } = await supabase.from("weekly_polls").select("*");
       if (!allPolls?.length) return;
 
-      const weekKey = getCurrentWeekKey();
+      const dayKey = getCurrentDayKey();
 
-      // Pick a random poll per user per week using hash
-      const seed = `${user?.id || "anon"}-${weekKey}`;
+      // Pick a random poll per user per day using hash
+      const seed = `${user?.id || "anon"}-${dayKey}`;
       const idx = hashSeed(seed) % allPolls.length;
       const p = allPolls[idx];
       setPoll(p);
