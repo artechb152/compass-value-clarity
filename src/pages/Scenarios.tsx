@@ -204,9 +204,9 @@ const Scenarios = () => {
                     </Button>
                   ))}
                 </div>
-                {currentIdx < scenarios.length - 1 && (
-                  <Button variant="secondary" onClick={goNext} className="w-full">ממשיכים לתרחיש הבא →</Button>
-                )}
+                <Button variant="secondary" onClick={goNext} className="w-full">
+                  {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא →" : "סיום"}
+                </Button>
               </div>
             )}
 
