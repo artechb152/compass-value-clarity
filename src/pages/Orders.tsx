@@ -24,7 +24,8 @@ const Orders = () => {
   const [orders, setOrders] = useState<Tables<"orders">[]>([]);
   const [selected, setSelected] = useState<Tables<"orders"> | null>(null);
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
-  const [inlineFeedback, setInlineFeedback] = useState<MiniFeedback | null>(null);
+  const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
+  const [feedbackIsCorrect, setFeedbackIsCorrect] = useState<boolean>(false);
   const [isCurrentCorrect, setIsCurrentCorrect] = useState<boolean | null>(null);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
   const [correctIds, setCorrectIds] = useState<string[]>([]);
@@ -47,7 +48,8 @@ const Orders = () => {
   const openOrder = (o: Tables<"orders">) => {
     setSelected(o);
     setMiniChoice(null);
-    setInlineFeedback(null);
+    setFeedbackModal(null);
+    setFeedbackIsCorrect(false);
     setIsCurrentCorrect(null);
     setMiniScenarioError(false);
     if (user && !viewedIds.includes(o.id)) {
@@ -71,7 +73,8 @@ const Orders = () => {
     if (feedbacks) {
       const fb = feedbacks.find(f => f.choice_index === i);
       if (fb) {
-        setInlineFeedback(isCorrect ? fb : { ...fb, title: fb.title || "לא מדויק" });
+        setFeedbackModal(isCorrect ? fb : { ...fb, title: fb.title || "לא מדויק" });
+        setFeedbackIsCorrect(isCorrect);
       }
     }
 
@@ -104,8 +107,8 @@ const Orders = () => {
   };
 
   const handleRetry = () => {
+    setFeedbackModal(null);
     setMiniChoice(null);
-    setInlineFeedback(null);
     setIsCurrentCorrect(null);
   };
 
@@ -249,27 +252,43 @@ const Orders = () => {
                     })}
                   </div>
 
-                  {/* Inline feedback */}
-                  {inlineFeedback && (
-                    <div className={`mt-3 rounded-lg p-3 ${isCurrentCorrect ? "bg-success/10 border border-success/30" : "bg-destructive/10 border border-destructive/30"}`}>
-                      <p className={`text-sm font-semibold mb-1 ${isCurrentCorrect ? "text-success" : "text-destructive"}`}>
-                        {inlineFeedback.title}
-                      </p>
-                      <p className="text-sm leading-relaxed">{inlineFeedback.text}</p>
-                      {isCurrentCorrect === false && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleRetry}
-                          className="mt-2 hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                        >
-                          נסה שנית
-                        </Button>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Modal */}
+      <Dialog open={!!feedbackModal} onOpenChange={(open) => {
+        if (!open) {
+          if (!feedbackIsCorrect) {
+            // Wrong answer - don't allow closing via X/ESC, must use "נסה שנית"
+            return;
+          }
+          setFeedbackModal(null);
+        }
+      }}>
+        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide ${!feedbackIsCorrect ? "[&>button:last-child]:hidden" : ""}`} dir="rtl" role="dialog" aria-modal="true">
+          {feedbackModal && (
+            <>
+              <DialogHeader className="text-right">
+                <DialogTitle className="text-lg text-right">{feedbackModal.title}</DialogTitle>
+                <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
+              </DialogHeader>
+              <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
+              {!feedbackIsCorrect && (
+                <p className="text-xs text-muted-foreground">לא נורא—נסה שוב.</p>
+              )}
+              <Button onClick={() => {
+                if (feedbackIsCorrect) {
+                  setFeedbackModal(null);
+                } else {
+                  handleRetry();
+                }
+              }} className="w-full mt-2">
+                {feedbackIsCorrect ? "המשך" : "נסה שנית"}
+              </Button>
             </>
           )}
         </DialogContent>
