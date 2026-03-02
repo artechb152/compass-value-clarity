@@ -178,7 +178,7 @@ const Scenarios = () => {
             )}
             <p className="text-sm whitespace-pre-line leading-relaxed mb-3 break-words">{scenario.story_he}</p>
             {dilemmaQuestion && (
-              <p className="text-sm font-semibold text-primary mb-4">{dilemmaQuestion}</p>
+              <p className="text-sm font-semibold text-foreground mb-4">{dilemmaQuestion}</p>
             )}
 
             {chosenIdx === null && !completedIds.has(scenario.id) && (
@@ -213,7 +213,7 @@ const Scenarios = () => {
             {chosenIdx !== null && !submitted && (
               <div className="space-y-5 mt-4">
                 <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-sm font-medium text-foreground mb-1">אין פה שחור-לבן. בוא נפרק את זה.</p>
+                  <p className="text-sm font-medium text-primary mb-1">אין פה שחור-לבן. בוא נפרק את זה.</p>
                   <p className="text-sm">{feedbacks[chosenIdx]}</p>
                 </div>
 
