@@ -200,29 +200,34 @@ const Orders = () => {
       <Dialog open={!!feedbackModal} onOpenChange={(open) => {
         if (!open) {
           const isWrong = selected && feedbackModal && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
+          if (isWrong) {
+            // Don't allow closing - force retry
+            return;
+          }
           setFeedbackModal(null);
-          if (isWrong) setMiniChoice(null);
         }
       }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl" role="dialog" aria-modal="true">
-          {feedbackModal && (
-            <>
-              <DialogHeader className="text-right">
-                <DialogTitle className="text-lg text-right">{feedbackModal.title}</DialogTitle>
-                <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
-              </DialogHeader>
-              <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
-              <Button onClick={() => {
-                const isWrong = selected && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
-                setFeedbackModal(null);
-                if (isWrong) {
-                  setMiniChoice(null);
-                }
-              }} className="w-full mt-2">
-                {selected && feedbackModal && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index ? "נסה שנית" : "הבנתי"}
-              </Button>
-            </>
-          )}
+        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide ${feedbackModal && selected && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index ? "[&>button:last-child]:hidden" : ""}`} dir="rtl" role="dialog" aria-modal="true">
+          {feedbackModal && (() => {
+            const isWrong = selected && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
+            return (
+              <>
+                <DialogHeader className="text-right">
+                  <DialogTitle className="text-lg text-right">{feedbackModal.title}</DialogTitle>
+                  <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
+                </DialogHeader>
+                <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
+                <Button onClick={() => {
+                  setFeedbackModal(null);
+                  if (isWrong) {
+                    setMiniChoice(null);
+                  }
+                }} className="w-full mt-2">
+                  {isWrong ? "נסה שנית" : "הבנתי"}
+                </Button>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </AppShell>

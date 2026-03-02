@@ -42,7 +42,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" align="start" sideOffset={4}><p>{theme === 'dark' ? 'מצב יום' : 'מצב לילה'}</p></TooltipContent>
+              <TooltipContent side="bottom" align="end" sideOffset={4}><p>{theme === 'dark' ? 'מצב יום' : 'מצב לילה'}</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
           {isAdmin && (
@@ -57,7 +57,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <LogOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" align="start" sideOffset={4}><p>התנתק</p></TooltipContent>
+              <TooltipContent side="bottom" align="end" sideOffset={4}><p>התנתק</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
