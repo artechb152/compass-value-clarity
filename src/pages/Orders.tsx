@@ -232,7 +232,7 @@ const Orders = () => {
                       const isCorrectChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i === correctIdx;
                       const isWrongChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i !== correctIdx;
                       // Disable buttons only after correct answer (not after wrong - allow retry)
-                      const isDisabled = isCurrentCorrect === true && !isSelected;
+                      const isDisabled = miniChoice !== null && !isSelected;
                       return (
                         <Button
                           key={i}
