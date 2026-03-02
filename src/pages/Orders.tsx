@@ -24,12 +24,12 @@ const Orders = () => {
   const [orders, setOrders] = useState<Tables<"orders">[]>([]);
   const [selected, setSelected] = useState<Tables<"orders"> | null>(null);
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
-  const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
+  const [inlineFeedback, setInlineFeedback] = useState<MiniFeedback | null>(null);
+  const [isCurrentCorrect, setIsCurrentCorrect] = useState<boolean | null>(null);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
   const [correctIds, setCorrectIds] = useState<string[]>([]);
   const [wrongIds, setWrongIds] = useState<string[]>([]);
   const [miniScenarioError, setMiniScenarioError] = useState(false);
-  const [hadWrongAttempt, setHadWrongAttempt] = useState(false);
 
   useEffect(() => {
     supabase.from("orders").select("*").then(({ data }) => data && setOrders(data));
@@ -47,25 +47,38 @@ const Orders = () => {
   const openOrder = (o: Tables<"orders">) => {
     setSelected(o);
     setMiniChoice(null);
+    setInlineFeedback(null);
+    setIsCurrentCorrect(null);
     setMiniScenarioError(false);
-    setHadWrongAttempt(false);
     if (user && !viewedIds.includes(o.id)) {
       const updated = [...viewedIds, o.id];
       setViewedIds(updated);
       localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updated));
     }
-    // Remove from correctIds if re-entering (will be re-added on correct close)
   };
 
-  const handleCloseOrder = (open: boolean) => {
-    if (!open) {
-      const correctIdx = selected?.mini_correct_index;
-      if (selected && (miniChoice === null || (correctIdx !== null && correctIdx !== undefined && miniChoice !== correctIdx))) {
-        setMiniScenarioError(true);
-        return;
+  const handleChoiceClick = (i: number) => {
+    if (!selected) return;
+    const correctIdx = selected.mini_correct_index;
+    const isCorrect = correctIdx !== null && correctIdx !== undefined && i === correctIdx;
+
+    setMiniChoice(i);
+    setIsCurrentCorrect(isCorrect);
+    setMiniScenarioError(false);
+
+    // Get feedback text
+    const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
+    if (feedbacks) {
+      const fb = feedbacks.find(f => f.choice_index === i);
+      if (fb) {
+        setInlineFeedback(isCorrect ? fb : { ...fb, title: fb.title || "לא מדויק" });
       }
-      // Mark as correctly answered when closing with correct answer
-      if (user && selected && miniChoice !== null && correctIdx !== null && correctIdx !== undefined && miniChoice === correctIdx) {
+    }
+
+    // Update card status
+    if (user) {
+      if (isCorrect) {
+        // Add to correct, remove from wrong
         if (!correctIds.includes(selected.id)) {
           const updated = [...correctIds, selected.id];
           setCorrectIds(updated);
@@ -74,19 +87,39 @@ const Orders = () => {
             supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
           }
         }
-        // Remove from wrongIds if previously wrong
         if (wrongIds.includes(selected.id)) {
           const updatedWrong = wrongIds.filter(id => id !== selected.id);
           setWrongIds(updatedWrong);
           localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
         }
+      } else {
+        // Add to wrong (only if not already correct)
+        if (!correctIds.includes(selected.id) && !wrongIds.includes(selected.id)) {
+          const updatedWrong = [...wrongIds, selected.id];
+          setWrongIds(updatedWrong);
+          localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+        }
+      }
+    }
+  };
+
+  const handleRetry = () => {
+    setMiniChoice(null);
+    setInlineFeedback(null);
+    setIsCurrentCorrect(null);
+  };
+
+  const handleCloseOrder = (open: boolean) => {
+    if (!open) {
+      // Must answer correctly before closing
+      if (selected && isCurrentCorrect !== true) {
+        setMiniScenarioError(true);
+        return;
       }
       setSelected(null);
       setMiniScenarioError(false);
     }
   };
-
-  const progressPct = orders.length > 0 ? Math.round((viewedIds.length / orders.length) * 100) : 0;
 
   return (
     <AppShell>
@@ -184,87 +217,61 @@ const Orders = () => {
                   {miniScenarioError && miniChoice === null && (
                     <p className="text-xs text-destructive mb-2 font-medium">יש לענות על התרחיש לפני סגירה</p>
                   )}
-                  {miniScenarioError && miniChoice !== null && (selected as any)?.mini_correct_index !== null && miniChoice !== (selected as any)?.mini_correct_index && (
-                    <p className="text-xs text-destructive mb-2 font-medium">תשובה לא נכונה, נסה שוב</p>
-                  )}
+
+                  {/* Answer buttons */}
                   <div className="space-y-2">
                     {(selected.mini_choices_json as string[] || []).map((choice, i) => {
                       const correctIdx = selected.mini_correct_index;
                       const isSelected = miniChoice === i;
                       const isCorrectChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i === correctIdx;
                       const isWrongChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i !== correctIdx;
+                      // Disable buttons only after correct answer (not after wrong - allow retry)
+                      const isDisabled = isCurrentCorrect === true && !isSelected;
                       return (
-                      <Button
-                        key={i}
-                        variant={isSelected ? "default" : "outline"}
-                        className={`w-full text-right justify-start h-auto py-2 px-3 ${isCorrectChoice ? "bg-success text-success-foreground hover:bg-success/90 border-success" : isWrongChoice ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive" : isSelected ? "bg-primary text-primary-foreground hover:bg-primary/90" : "hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
-                        onClick={() => {
-                          setMiniChoice(i);
-                          setMiniScenarioError(false);
-                          const correctIdx = selected.mini_correct_index;
-                          const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
-                          if (feedbacks) {
-                            const fb = feedbacks.find(f => f.choice_index === i);
-                            if (fb) {
-                              if (correctIdx !== null && correctIdx !== undefined && i !== correctIdx) {
-                                setHadWrongAttempt(true);
-                                // Track wrong attempt for card status
-                                if (user && selected && !wrongIds.includes(selected.id)) {
-                                  const updatedWrong = [...wrongIds, selected.id];
-                                  setWrongIds(updatedWrong);
-                                  localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
-                                }
-                                setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
-                              } else {
-                                setFeedbackModal(fb);
-                              }
-                            }
-                          }
-                        }}
-                      >
-                        {choice}
-                      </Button>
+                        <Button
+                          key={i}
+                          variant={isSelected ? "default" : "outline"}
+                          disabled={isDisabled}
+                          className={`w-full text-right justify-start h-auto py-2 px-3 gap-2 ${
+                            isCorrectChoice
+                              ? "bg-success text-success-foreground hover:bg-success/90 border-success"
+                              : isWrongChoice
+                              ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive"
+                              : "hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                          }`}
+                          onClick={() => handleChoiceClick(i)}
+                        >
+                          <span className="flex-1 text-right">{choice}</span>
+                          {isCorrectChoice && <CheckCircle className="h-4 w-4 shrink-0" />}
+                          {isWrongChoice && <XCircle className="h-4 w-4 shrink-0" />}
+                        </Button>
                       );
                     })}
                   </div>
+
+                  {/* Inline feedback */}
+                  {inlineFeedback && (
+                    <div className={`mt-3 rounded-lg p-3 ${isCurrentCorrect ? "bg-success/10 border border-success/30" : "bg-destructive/10 border border-destructive/30"}`}>
+                      <p className={`text-sm font-semibold mb-1 ${isCurrentCorrect ? "text-success" : "text-destructive"}`}>
+                        {inlineFeedback.title}
+                      </p>
+                      <p className="text-sm leading-relaxed">{inlineFeedback.text}</p>
+                      {isCurrentCorrect === false && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleRetry}
+                          className="mt-2 hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                        >
+                          נסה שנית
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!feedbackModal} onOpenChange={(open) => {
-        if (!open) {
-          const isWrong = selected && feedbackModal && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
-          if (isWrong) {
-            // Don't allow closing - force retry
-            return;
-          }
-          setFeedbackModal(null);
-        }
-      }}>
-        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide ${feedbackModal && selected && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index ? "[&>button:last-child]:hidden" : ""}`} dir="rtl" role="dialog" aria-modal="true">
-          {feedbackModal && (() => {
-            const isWrong = selected && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
-            return (
-              <>
-                <DialogHeader className="text-right">
-                  <DialogTitle className="text-lg text-right">{feedbackModal.title}</DialogTitle>
-                  <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
-                </DialogHeader>
-                <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
-                <Button onClick={() => {
-                  setFeedbackModal(null);
-                  if (isWrong) {
-                    setMiniChoice(null);
-                  }
-                }} className="w-full mt-2">
-                  {isWrong ? "נסה שנית" : "הבנתי"}
-                </Button>
-              </>
-            );
-          })()}
         </DialogContent>
       </Dialog>
     </AppShell>
