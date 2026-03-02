@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
@@ -18,6 +18,7 @@ const modules = [
 const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
   const [introChecked, setIntroChecked] = useState(false);
   const [introCompleted, setIntroCompleted] = useState(true);
@@ -67,7 +68,7 @@ const Home = () => {
       }
     };
     loadProgress();
-  }, [user]);
+  }, [user, location.key]);
 
   if (!introChecked) {
     return (
