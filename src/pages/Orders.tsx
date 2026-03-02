@@ -73,8 +73,11 @@ const Orders = () => {
     if (feedbacks) {
       const fb = feedbacks.find(f => f.choice_index === i);
       if (fb) {
-        setFeedbackModal(isCorrect ? fb : { ...fb, title: fb.title || "לא מדויק" });
-        setFeedbackIsCorrect(isCorrect);
+        if (!isCorrect) {
+          setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
+          setFeedbackIsCorrect(false);
+        }
+        // Correct answer: no popup, just show green button
       }
     }
 
