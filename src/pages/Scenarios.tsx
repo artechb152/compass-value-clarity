@@ -270,7 +270,7 @@ const Scenarios = () => {
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
-        <DialogContent className="max-w-sm [direction:rtl]" dir="rtl" role="dialog" aria-modal="true">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl" role="dialog" aria-modal="true">
           <DialogHeader className="text-right">
             <DialogTitle className="text-lg text-right">המשוב שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
@@ -292,7 +292,7 @@ const Scenarios = () => {
 
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
-        <DialogContent className="max-w-sm text-center [direction:rtl]" dir="rtl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide text-center" dir="rtl">
           <DialogHeader>
             <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
             <DialogDescription className="text-base mt-2 text-right">
