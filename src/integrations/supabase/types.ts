@@ -115,6 +115,7 @@ export type Database = {
           tension_discipline_responsibility: number | null
           tension_mission_human: number | null
           user_id: string
+          value_impacts_json: Json | null
         }
         Insert: {
           choice?: number | null
@@ -126,6 +127,7 @@ export type Database = {
           tension_discipline_responsibility?: number | null
           tension_mission_human?: number | null
           user_id: string
+          value_impacts_json?: Json | null
         }
         Update: {
           choice?: number | null
@@ -137,6 +139,7 @@ export type Database = {
           tension_discipline_responsibility?: number | null
           tension_mission_human?: number | null
           user_id?: string
+          value_impacts_json?: Json | null
         }
         Relationships: [
           {

@@ -1,0 +1,1 @@
+ALTER TABLE public.responses ADD COLUMN value_impacts_json jsonb;
