@@ -172,10 +172,17 @@ const Orders = () => {
                         onClick={() => {
                           setMiniChoice(i);
                           setMiniScenarioError(false);
+                          const correctIdx = selected.mini_correct_index;
                           const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
                           if (feedbacks) {
                             const fb = feedbacks.find(f => f.choice_index === i);
-                            if (fb) setFeedbackModal(fb);
+                            if (fb) {
+                              if (correctIdx !== null && correctIdx !== undefined && i !== correctIdx) {
+                                setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
+                              } else {
+                                setFeedbackModal(fb);
+                              }
+                            }
                           }
                         }}
                       >
@@ -191,7 +198,7 @@ const Orders = () => {
       </Dialog>
 
       <Dialog open={!!feedbackModal} onOpenChange={() => setFeedbackModal(null)}>
-        <DialogContent className="max-w-sm" dir="rtl" role="dialog" aria-modal="true">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl" role="dialog" aria-modal="true">
           {feedbackModal && (
             <>
               <DialogHeader className="text-right">
@@ -199,7 +206,9 @@ const Orders = () => {
                 <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
               </DialogHeader>
               <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
-              <Button onClick={() => setFeedbackModal(null)} className="w-full mt-2">הבנתי</Button>
+              <Button onClick={() => setFeedbackModal(null)} className="w-full mt-2">
+                {selected && feedbackModal && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index ? "נסה שנית" : "הבנתי"}
+              </Button>
             </>
           )}
         </DialogContent>

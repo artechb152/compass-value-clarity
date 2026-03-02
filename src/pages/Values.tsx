@@ -132,11 +132,11 @@ const Values = () => {
       </div>
 
       <Dialog open={!!selected} onOpenChange={handleCloseValue}>
-        <DialogContent className="max-w-md max-h-[70vh] overflow-y-auto scrollbar-hide p-4" dir="rtl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
           {selected && (
-            <div className="space-y-3">
-              <DialogHeader className="text-right pb-0 pr-10 pl-0">
-                <DialogTitle className="text-lg text-right leading-snug">{selected.title_he}</DialogTitle>
+            <>
+              <DialogHeader className="text-right">
+                <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
                 <DialogDescription className="sr-only">ערך מתוך רוח צה״ל</DialogDescription>
               </DialogHeader>
 
@@ -156,7 +156,7 @@ const Values = () => {
                   <p className="text-sm">{(selected as any).what_it_means_in_practice_he}</p>
                 </div>
               )}
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>

@@ -31,7 +31,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-8 w-auto" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6}><p className="text-[10px]">מסך הבית</p></TooltipContent>
+            <TooltipContent side="bottom" align="start" sideOffset={4} className="px-2 py-0.5"><p className="text-[10px]">מסך הבית</p></TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <div className="flex items-center gap-1">
@@ -42,7 +42,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6}><p className="text-[10px]">{theme === 'dark' ? 'מצב יום' : 'מצב לילה'}</p></TooltipContent>
+              <TooltipContent side="bottom" align="end" sideOffset={4} className="px-2 py-0.5"><p className="text-[10px]">{theme === 'dark' ? 'מצב יום' : 'מצב לילה'}</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
           {isAdmin && (
@@ -57,7 +57,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <LogOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6}><p className="text-[10px]">התנתק</p></TooltipContent>
+              <TooltipContent side="bottom" align="end" sideOffset={4} className="px-2 py-0.5"><p className="text-[10px]">התנתק</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
