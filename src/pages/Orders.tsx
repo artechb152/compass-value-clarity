@@ -154,7 +154,7 @@ const Orders = () => {
             return (
               <Card
                 key={o.id}
-                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isCorrect ? "ring-2 ring-success/40 border-success/50" : isWrong ? "ring-2 ring-destructive/40 border-destructive/50" : ""}`}
+                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isCorrect ? "border-success" : isWrong ? "border-destructive" : ""}`}
                 onClick={() => openOrder(o)}
                 role="button"
                 tabIndex={0}
