@@ -243,7 +243,7 @@ const Orders = () => {
                               ? "bg-success text-success-foreground hover:bg-success/90 border-success"
                               : isWrongChoice
                               ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive"
-                              : "hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                              : "hover:!bg-primary hover:!text-primary-foreground hover:!border-primary"
                           }`}
                           onClick={() => handleChoiceClick(i)}
                         >
