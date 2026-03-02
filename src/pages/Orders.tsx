@@ -206,7 +206,13 @@ const Orders = () => {
                 <DialogDescription className="sr-only">משוב על הבחירה</DialogDescription>
               </DialogHeader>
               <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
-              <Button onClick={() => setFeedbackModal(null)} className="w-full mt-2">
+              <Button onClick={() => {
+                const isWrong = selected && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
+                setFeedbackModal(null);
+                if (isWrong) {
+                  setMiniChoice(null);
+                }
+              }} className="w-full mt-2">
                 {selected && feedbackModal && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index ? "נסה שנית" : "הבנתי"}
               </Button>
             </>

@@ -37,8 +37,7 @@ const Scenarios = () => {
   const [initialIdxSet, setInitialIdxSet] = useState(false);
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
-  const [tensionMH, setTensionMH] = useState([5]);
-  const [tensionDR, setTensionDR] = useState([5]);
+  const [valueImpacts, setValueImpacts] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -94,6 +93,7 @@ const Scenarios = () => {
     setSelectedValues((prev) => prev.includes(v) ? prev.filter((x) => x !== v) : prev.length < 2 ? [...prev, v] : prev);
   };
 
+  const impactValues = conflicts.slice(0, 3);
   const canShowSummary = chosenIdx !== null && selectedValues.length === 2 && reflection.trim().length >= 1;
 
   const handleSubmit = async () => {
@@ -103,10 +103,9 @@ const Scenarios = () => {
       scenario_id: scenario.id,
       choice: chosenIdx,
       selected_values_json: selectedValues,
-      tension_mission_human: tensionMH[0] * 10,
-      tension_discipline_responsibility: tensionDR[0] * 10,
+      value_impacts_json: valueImpacts,
       reflection_text: reflection,
-    });
+    } as any);
     setCompletedIds(prev => {
       const newCompleted = new Set([...prev, scenario.id]);
       const allDone = scenarios.every(s => newCompleted.has(s.id));
@@ -136,8 +135,7 @@ const Scenarios = () => {
   const resetState = () => {
     setChosenIdx(null);
     setSelectedValues([]);
-    setTensionMH([5]);
-    setTensionDR([5]);
+    setValueImpacts({});
     setReflection("");
     setSubmitted(false);
   };
@@ -227,31 +225,18 @@ const Scenarios = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-sm font-medium text-primary">סמן איפה זה יושב אצלך:</p>
-                  <div>
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>משימה</span>
-                      <span>כבוד האדם</span>
+                  <p className="text-sm font-medium text-primary">כמה לפי דעתך הערכים באו לידי פגיעה:</p>
+                  {impactValues.map((val) => (
+                    <div key={val}>
+                      <p className="text-xs font-medium text-foreground mb-1">{val}</p>
+                      <Slider value={[valueImpacts[val] ?? 5]} onValueChange={(v) => setValueImpacts(prev => ({ ...prev, [val]: v[0] }))} min={1} max={10} step={1} aria-label={`מידת פגיעה: ${val}`} />
+                      <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
+                        {Array.from({ length: 10 }, (_, i) => (
+                          <span key={i}>{i + 1}</span>
+                        ))}
+                      </div>
                     </div>
-                    <Slider value={tensionMH} onValueChange={setTensionMH} min={1} max={10} step={1} aria-label="מתח: משימה מול כבוד האדם" />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <span key={i}>{i + 1}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>משמעת</span>
-                      <span>אחריות אישית</span>
-                    </div>
-                    <Slider value={tensionDR} onValueChange={setTensionDR} min={1} max={10} step={1} aria-label="מתח: משמעת מול אחריות אישית" />
-                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <span key={i}>{i + 1}</span>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 <div>
@@ -278,7 +263,7 @@ const Scenarios = () => {
           <div className="space-y-3 text-sm text-right">
             <p>• <strong>בחרת:</strong> {choiceLabel}</p>
             <p>• <strong>ערכים שהתנגשו:</strong> {selectedValues.join(" ו‑")}</p>
-            <p>• <strong>המדדים שלך:</strong> משימה‑כבוד האדם ({tensionMH[0]}), משמעת‑אחריות ({tensionDR[0]})</p>
+            <p>• <strong>מידת פגיעה בערכים:</strong> {Object.entries(valueImpacts).map(([k, v]) => `${k} (${v})`).join(", ")}</p>
             {reflection && <p>• <strong>השורה שלך:</strong> "{reflection}"</p>}
             {closingFeedback?.summary_text && (
               <p className="font-semibold text-primary mt-2">{closingFeedback.summary_text}</p>
