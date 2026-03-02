@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import SegmentedProgress from "@/components/SegmentedProgress";
 import { ExternalLink, AlertTriangle, CheckCircle, XCircle, ArrowRight } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -80,7 +80,7 @@ const Orders = () => {
         </div>
 
         <div className="flex items-center gap-3 mb-6">
-          <Progress value={progressPct} className="h-2 flex-1" />
+          <SegmentedProgress completed={viewedIds.length} total={orders.length || 3} />
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{orders.length}</span>
         </div>
 

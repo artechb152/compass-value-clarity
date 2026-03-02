@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ArrowRight, Trophy } from "lucide-react";
@@ -164,7 +164,7 @@ const Scenarios = () => {
         </div>
 
         <div className="flex items-center gap-3 mb-4">
-          <Progress value={progressPct} className="h-2 flex-1" />
+          <SegmentedProgress completed={completedCount} total={SCENARIOS_PER_USER} />
           <span className="text-xs text-muted-foreground whitespace-nowrap">{completedCount}/{SCENARIOS_PER_USER}</span>
         </div>
 

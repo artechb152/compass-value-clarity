@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight, Trophy } from "lucide-react";
 
@@ -34,7 +34,7 @@ const Home = () => {
 
     const loadProgress = async () => {
       const { data: responses } = await supabase.from("responses").select("scenario_id").eq("user_id", user.id);
-      const scenarioCount = new Set(responses?.map(r => r.scenario_id)).size;
+      const scenarioCount = new Set(responses?.map(r => r.scenario_id).filter(Boolean)).size;
 
       const { data: votes } = await supabase.from("weekly_votes").select("id").eq("user_id", user.id);
       const weeklyDone = (votes && votes.length > 0) ? 1 : 0;
@@ -114,7 +114,7 @@ const Home = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-3">
-                      <Progress value={pct} className="h-2 flex-1" />
+                      <SegmentedProgress completed={prog.completed} total={prog.total} />
                       <span className={`text-xs whitespace-nowrap ${isDone ? "text-success font-medium" : "text-muted-foreground"}`}>{label}</span>
                     </div>
                   </CardContent>
