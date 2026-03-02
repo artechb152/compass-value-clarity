@@ -99,7 +99,7 @@ const Values = () => {
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{values.length}</span>
         </div>
 
-        <div className="flex flex-col gap-3 pb-4 overflow-y-auto flex-1" ref={scrollRef}>
+        <div className="flex flex-col gap-3 pb-4 overflow-y-auto flex-1 scrollbar-hide" ref={scrollRef}>
           {values.map((v) => {
             const isViewed = viewedIds.includes(v.id);
             return (

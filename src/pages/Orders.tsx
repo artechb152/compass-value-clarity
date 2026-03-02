@@ -61,12 +61,6 @@ const Orders = () => {
       }
       setSelected(null);
       setMiniScenarioError(false);
-      if (user) {
-        const currentViewed = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
-        if (currentViewed.length >= orders.length && orders.length > 0) {
-          navigate("/");
-        }
-      }
     }
   };
 
@@ -76,7 +70,7 @@ const Orders = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
+          <Button variant="ghost" size="icon" onClick={() => { if (user) sessionStorage.setItem(`intro_seen_this_session_${user.id}`, "1"); navigate("/"); }} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
