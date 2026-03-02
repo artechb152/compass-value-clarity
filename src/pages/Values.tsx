@@ -85,7 +85,7 @@ const Values = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto h-[calc(100vh-56px)] flex flex-col overflow-hidden">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary [&:hover_svg]:text-white">
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
@@ -156,6 +156,27 @@ const Values = () => {
                   <p className="text-sm">{(selected as any).what_it_means_in_practice_he}</p>
                 </div>
               )}
+
+              {/* Next value button */}
+              {values.length > 0 && (() => {
+                const currentIndex = values.findIndex(v => v.id === selected.id);
+                const nextIndex = currentIndex + 1;
+                if (nextIndex < values.length) {
+                  return (
+                    <div className="flex justify-center pt-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => openValue(values[nextIndex])}
+                        className="hover:bg-primary hover:text-primary-foreground gap-2"
+                      >
+                        <span>לערך הבא</span>
+                        <ArrowRight className="h-4 w-4 rotate-180 text-primary" />
+                      </Button>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </>
           )}
         </DialogContent>
