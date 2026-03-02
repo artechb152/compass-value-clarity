@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import SegmentedProgress from "@/components/SegmentedProgress";
 import { ExternalLink, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -75,7 +75,7 @@ const Values = () => {
         </div>
 
         <div className="flex items-center gap-3 mb-6">
-          <Progress value={progressPct} className="h-2 flex-1" />
+          <SegmentedProgress completed={viewedIds.length} total={values.length || 11} />
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{values.length}</span>
         </div>
 
