@@ -51,22 +51,25 @@ const Orders = () => {
       setViewedIds(updated);
       localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updated));
     }
+    // Remove from correctIds if re-entering (will be re-added on correct close)
   };
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
-      const correctIdx = (selected as any)?.mini_correct_index;
+      const correctIdx = selected?.mini_correct_index;
       if (selected && (miniChoice === null || (correctIdx !== null && correctIdx !== undefined && miniChoice !== correctIdx))) {
         setMiniScenarioError(true);
         return;
       }
-      // Mark as correctly answered only if no wrong attempts in this session
-      if (user && selected && !correctIds.includes(selected.id) && !hadWrongAttempt) {
-        const updated = [...correctIds, selected.id];
-        setCorrectIds(updated);
-        localStorage.setItem(`correct_orders_${user.id}`, JSON.stringify(updated));
-        if (updated.length >= orders.length && orders.length > 0) {
-          supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+      // Mark as correctly answered when closing with correct answer
+      if (user && selected && miniChoice !== null && correctIdx !== null && correctIdx !== undefined && miniChoice === correctIdx) {
+        if (!correctIds.includes(selected.id)) {
+          const updated = [...correctIds, selected.id];
+          setCorrectIds(updated);
+          localStorage.setItem(`correct_orders_${user.id}`, JSON.stringify(updated));
+          if (updated.length >= orders.length && orders.length > 0) {
+            supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+          }
         }
       }
       setSelected(null);

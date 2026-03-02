@@ -66,7 +66,7 @@ const IntroVideo = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 to-background flex flex-col items-center p-4 relative" dir="rtl">
-      <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="absolute top-4 left-4 text-muted-foreground" aria-label="החלף מצב תצוגה">
+      <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="absolute top-4 left-4 text-muted-foreground hover:bg-primary hover:text-primary-foreground" aria-label="החלף מצב תצוגה">
         {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </Button>
       <div className="w-full max-w-2xl mt-8">

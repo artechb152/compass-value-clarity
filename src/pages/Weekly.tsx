@@ -114,7 +114,7 @@ const Weekly = () => {
               return (
                 <div key={i}>
                   {!voted ? (
-                    <Button variant="outline" className="w-full text-right justify-start h-auto py-3" onClick={() => handleVote(i)}>
+                    <Button variant="outline" className="w-full text-right justify-start h-auto py-3 hover:bg-primary hover:text-primary-foreground hover:border-primary" onClick={() => handleVote(i)}>
                       {opt}
                     </Button>
                   ) : (
