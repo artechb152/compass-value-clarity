@@ -181,7 +181,7 @@ const Orders = () => {
                       <Button
                         key={i}
                         variant={miniChoice === i ? "default" : "outline"}
-                        className={`w-full text-right justify-start h-auto py-2 px-3 ${miniChoice === i ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
+                        className={`w-full text-right justify-start h-auto py-2 px-3 ${miniChoice === i ? "bg-primary text-primary-foreground dark:bg-accent dark:text-accent-foreground hover:bg-primary/90 dark:hover:bg-accent/90" : ""}`}
                         onClick={() => {
                           setMiniChoice(i);
                           setMiniScenarioError(false);
