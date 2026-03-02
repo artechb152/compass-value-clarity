@@ -167,7 +167,7 @@ const Values = () => {
                       <Button
                         variant="outline"
                         onClick={() => openValue(values[nextIndex])}
-                        className="hover:bg-primary hover:text-primary-foreground gap-2"
+                        className="hover:bg-primary hover:text-primary-foreground gap-2 [&:hover_svg]:text-white"
                       >
                         <span>לערך הבא</span>
                         <ArrowRight className="h-4 w-4 rotate-180 text-primary" />
