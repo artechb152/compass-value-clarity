@@ -31,7 +31,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-8 w-auto" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom"><p>מסך הבית</p></TooltipContent>
+            <TooltipContent side="left" sideOffset={8}><p className="text-xs">מסך הבית</p></TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <div className="flex items-center gap-1">
@@ -42,7 +42,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><p>{theme === 'dark' ? 'מצב יום' : 'מצב לילה'}</p></TooltipContent>
+              <TooltipContent side="right" sideOffset={8}><p className="text-xs">{theme === 'dark' ? 'מצב יום' : 'מצב לילה'}</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
           {isAdmin && (
@@ -57,7 +57,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   <LogOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><p>התנתק</p></TooltipContent>
+              <TooltipContent side="right" sideOffset={8}><p className="text-xs">התנתק</p></TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>

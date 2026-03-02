@@ -53,8 +53,9 @@ const Orders = () => {
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
-      // Block closing if mini-scenario not answered
-      if (selected && miniChoice === null) {
+      // Block closing if scenario not answered correctly
+      const correctIdx = (selected as any)?.mini_correct_index;
+      if (selected && (miniChoice === null || (correctIdx !== null && correctIdx !== undefined && miniChoice !== correctIdx))) {
         setMiniScenarioError(true);
         return;
       }
@@ -117,7 +118,7 @@ const Orders = () => {
       </div>
 
       <Dialog open={!!selected} onOpenChange={handleCloseOrder}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
           {selected && (
             <>
               <DialogHeader className="text-right">
@@ -160,10 +161,13 @@ const Orders = () => {
                 </div>
 
                 <div className={`rounded-lg p-3 transition-all ${miniScenarioError && miniChoice === null ? "bg-destructive/10 ring-2 ring-destructive" : "bg-accent/10"}`}>
-                  <h3 className="font-semibold text-sm text-primary mb-2">מיני-תרחיש</h3>
+                  <h3 className="font-semibold text-sm text-primary mb-2">תרחיש</h3>
                   <p className="text-sm mb-3">{selected.mini_scenario_he}</p>
                   {miniScenarioError && miniChoice === null && (
-                    <p className="text-xs text-destructive mb-2 font-medium">יש לענות על המיני-תרחיש לפני סגירה</p>
+                    <p className="text-xs text-destructive mb-2 font-medium">יש לענות על התרחיש לפני סגירה</p>
+                  )}
+                  {miniScenarioError && miniChoice !== null && (selected as any)?.mini_correct_index !== null && miniChoice !== (selected as any)?.mini_correct_index && (
+                    <p className="text-xs text-destructive mb-2 font-medium">תשובה לא נכונה, נסה שוב</p>
                   )}
                   <div className="space-y-2">
                     {(selected.mini_choices_json as string[] || []).map((choice, i) => (
