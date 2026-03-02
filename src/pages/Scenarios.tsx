@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
@@ -184,7 +183,7 @@ const Scenarios = () => {
 
             {chosenIdx === null && !completedIds.has(scenario.id) && (
               <>
-                <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר—איזה ערכים מתנגשים לך בראש?</p>
+                <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר – איזה ערכים מתנגשים לך בראש?</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
                     <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground" onClick={() => setChosenIdx(i)}>
@@ -214,7 +213,7 @@ const Scenarios = () => {
             {chosenIdx !== null && !submitted && (
               <div className="space-y-5 mt-4">
                 <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-sm font-medium text-primary mb-1">אין פה שחור־לבן. בוא נפרק את זה.</p>
+                  <p className="text-sm font-medium text-foreground mb-1">אין פה שחור-לבן. בוא נפרק את זה.</p>
                   <p className="text-sm">{feedbacks[chosenIdx]}</p>
                 </div>
 
@@ -222,14 +221,13 @@ const Scenarios = () => {
                   <p className="text-sm font-medium mb-2">בחר 2 ערכים שהתנגשו פה:</p>
                   <div className="flex flex-wrap gap-2">
                     {conflicts.map((v) => (
-                      <Badge
+                      <button
                         key={v}
-                        variant={selectedValues.includes(v) ? "default" : "outline"}
-                        className="cursor-pointer"
+                        className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"}`}
                         onClick={() => toggleValue(v)}
                       >
                         {v}
-                      </Badge>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -263,7 +261,7 @@ const Scenarios = () => {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium mb-1">משפט אחד לעצמך—מה אתה לוקח מהסיטואציה?</p>
+                  <p className="text-sm font-medium mb-1">משפט אחד לעצמך – מה אתה לוקח מהסיטואציה?</p>
                   <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} />
                 </div>
 
@@ -286,7 +284,7 @@ const Scenarios = () => {
           <div className="space-y-3 text-sm text-right">
             <p>• <strong>בחרת:</strong> {choiceLabel}</p>
             <p>• <strong>ערכים שהתנגשו:</strong> {valuesLabel}</p>
-            <p>• <strong>המדדים שלך:</strong> משימה↔כבוד האדם ({tensionMH[0]}), משמעת↔אחריות ({tensionDR[0]})</p>
+            <p>• <strong>המדדים שלך:</strong> משימה–כבוד האדם ({tensionMH[0]}), משמעת–אחריות ({tensionDR[0]})</p>
             {reflection && <p>• <strong>השורה שלך:</strong> "{reflection}"</p>}
             {closingFeedback?.summary_text && (
               <p className="font-semibold text-primary mt-2">{closingFeedback.summary_text}</p>
