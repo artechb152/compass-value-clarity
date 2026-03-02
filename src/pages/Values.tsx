@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +17,8 @@ const Values = () => {
   const [selected, setSelected] = useState<Tables<"values"> | null>(null);
   const [selectedConflicts, setSelectedConflicts] = useState<string[]>([]);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollHint, setShowScrollHint] = useState(true);
 
   useEffect(() => {
     supabase.from("values").select("*").then(({ data }) => data && setValues(data));
@@ -43,7 +45,6 @@ const Values = () => {
   const handleCloseValue = (open: boolean) => {
     if (!open) {
       setSelected(null);
-      // Check if all values completed, navigate home
       if (user) {
         const currentViewed = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
         if (currentViewed.length >= values.length && values.length > 0) {
@@ -61,9 +62,28 @@ const Values = () => {
 
   const progressPct = values.length > 0 ? Math.round((viewedIds.length / values.length) * 100) : 0;
 
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+    setShowScrollHint(!atBottom);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll, values]);
+
   return (
     <AppShell>
-      <div className="p-4 max-w-2xl mx-auto">
+      <div className="p-4 max-w-2xl mx-auto h-[calc(100vh-56px)] flex flex-col overflow-hidden">
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
@@ -79,7 +99,7 @@ const Values = () => {
           <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{values.length}</span>
         </div>
 
-        <div className="flex flex-col gap-3 pb-4">
+        <div className="flex flex-col gap-3 pb-4 overflow-y-auto flex-1" ref={scrollRef}>
           {values.map((v) => {
             const isViewed = viewedIds.includes(v.id);
             return (
@@ -104,9 +124,9 @@ const Values = () => {
           })}
         </div>
 
-        {values.length > 5 && (
-          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex justify-center">
-            <ChevronDown className="h-6 w-6 text-muted-foreground/40" />
+        {values.length > 5 && showScrollHint && (
+          <div className="flex justify-center py-2 pointer-events-none transition-opacity duration-300">
+            <ChevronDown className="h-6 w-6 text-muted-foreground/40 animate-bounce" />
           </div>
         )}
       </div>
