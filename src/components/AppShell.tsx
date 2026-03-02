@@ -28,10 +28,10 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           <Tooltip>
             <TooltipTrigger asChild>
               <button onClick={() => navigate("/")} className="flex items-center gap-2 transition-transform hover:scale-105" aria-label="מסך הבית">
-                <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-8 w-auto" />
+                <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-10 w-auto" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" align="end" sideOffset={4}><p>מסך הבית</p></TooltipContent>
+            <TooltipContent side="bottom" align="end" sideOffset={4}><p>חזרה</p></TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <div className="flex items-center gap-1">

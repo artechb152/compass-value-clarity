@@ -197,7 +197,7 @@ const Scenarios = () => {
                   ))}
                 </div>
                 <Button variant="secondary" onClick={goNext} className="w-full">
-                  {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא →" : "סיום"}
+                  {currentIdx !== null && currentIdx < scenarios.length - 1 ? "← ממשיכים לתרחיש הבא" : "סיום"}
                 </Button>
               </div>
             )}
@@ -225,10 +225,10 @@ const Scenarios = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-sm font-medium text-primary">כמה לפי דעתך הערכים באו לידי פגיעה:</p>
+                  <p className="text-sm font-medium text-foreground">כמה לפי דעתך הערכים באו לידי פגיעה:</p>
                   {impactValues.map((val) => (
                     <div key={val}>
-                      <p className="text-xs font-medium text-foreground mb-1">{val}</p>
+                      <p className="text-xs font-medium text-foreground mb-2">{val}</p>
                       <Slider value={[valueImpacts[val] ?? 5]} onValueChange={(v) => setValueImpacts(prev => ({ ...prev, [val]: v[0] }))} min={1} max={10} step={1} aria-label={`מידת פגיעה: ${val}`} />
                       <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
                         {Array.from({ length: 10 }, (_, i) => (
@@ -244,7 +244,7 @@ const Scenarios = () => {
                   <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} className="resize-none" />
                 </div>
 
-                <Button variant="outline" onClick={handleSubmit} className="w-full hover:bg-primary hover:text-primary-foreground" disabled={!canShowSummary}>
+                <Button variant={canShowSummary ? "default" : "outline"} onClick={handleSubmit} className={`w-full ${canShowSummary ? "" : "hover:bg-primary hover:text-primary-foreground"}`} disabled={!canShowSummary}>
                   סיכום והמשך
                 </Button>
               </div>
@@ -270,7 +270,7 @@ const Scenarios = () => {
             )}
           </div>
           <Button onClick={goNext} className="w-full mt-2">
-            {currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא →" : "סיום"}
+            {currentIdx < scenarios.length - 1 ? "← ממשיכים לתרחיש הבא" : "סיום"}
           </Button>
         </DialogContent>
       </Dialog>
