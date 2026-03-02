@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN mini_correct_index integer;

@@ -42,6 +42,7 @@ export type Database = {
         Row: {
           id: string
           mini_choices_json: Json | null
+          mini_correct_index: number | null
           mini_feedback_json: Json | null
           mini_scenario_he: string | null
           official_definition_he: string | null
@@ -54,6 +55,7 @@ export type Database = {
         Insert: {
           id: string
           mini_choices_json?: Json | null
+          mini_correct_index?: number | null
           mini_feedback_json?: Json | null
           mini_scenario_he?: string | null
           official_definition_he?: string | null
@@ -66,6 +68,7 @@ export type Database = {
         Update: {
           id?: string
           mini_choices_json?: Json | null
+          mini_correct_index?: number | null
           mini_feedback_json?: Json | null
           mini_scenario_he?: string | null
           official_definition_he?: string | null
