@@ -70,11 +70,14 @@ const Weekly = () => {
     toast.success("ההצבעה נשמרה!");
     const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: poll.id });
     if (res) setResults(res as any);
-    // Auto-redirect to home after a short delay so completion popup can trigger
-    // Clear the final completion flag so it shows after weekly is done
-    if (user) sessionStorage.removeItem(`final_completion_shown_${user.id}`);
+    // Navigate to home and trigger final completion popup
+    if (user) {
+      sessionStorage.removeItem(`final_completion_shown_${user.id}`);
+      // Ensure intro gate won't redirect away from home
+      sessionStorage.setItem(`intro_seen_this_session_${user.id}`, "1");
+    }
     setTimeout(() => {
-      navigate("/");
+      navigate("/", { replace: true });
     }, 2500);
   };
 

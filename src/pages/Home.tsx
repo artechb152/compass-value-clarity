@@ -102,7 +102,7 @@ const Home = () => {
             const label = isDone ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
             return (
               <Link to={mod.to} key={mod.key}>
-                <Card className={`hover:shadow-lg transition-shadow border-r-4 mb-2 ${isDone ? "border-r-success" : "border-r-primary/30"}`}>
+                <Card className={`hover:shadow-lg transition-shadow mb-2`}>
                   <CardHeader className="pb-2 flex-row items-center gap-3">
                     <div className="bg-primary/10 p-2 rounded-lg">
                       <mod.icon className="h-6 w-6 text-primary" />
