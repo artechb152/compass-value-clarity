@@ -27,6 +27,7 @@ const Orders = () => {
   const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
   const [correctIds, setCorrectIds] = useState<string[]>([]);
+  const [wrongIds, setWrongIds] = useState<string[]>([]);
   const [miniScenarioError, setMiniScenarioError] = useState(false);
   const [hadWrongAttempt, setHadWrongAttempt] = useState(false);
 
@@ -37,6 +38,8 @@ const Orders = () => {
       setViewedIds(stored);
       const storedCorrect = JSON.parse(localStorage.getItem(`correct_orders_${user.id}`) || "[]");
       setCorrectIds(storedCorrect);
+      const storedWrong = JSON.parse(localStorage.getItem(`wrong_orders_${user.id}`) || "[]");
+      setWrongIds(storedWrong);
       supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
     }
   }, [user]);
@@ -71,6 +74,12 @@ const Orders = () => {
             supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
           }
         }
+        // Remove from wrongIds if previously wrong
+        if (wrongIds.includes(selected.id)) {
+          const updatedWrong = wrongIds.filter(id => id !== selected.id);
+          setWrongIds(updatedWrong);
+          localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+        }
       }
       setSelected(null);
       setMiniScenarioError(false);
@@ -101,13 +110,12 @@ const Orders = () => {
           {orders.map((o) => {
             const cfg = typeConfig[o.type] || typeConfig.legal;
             const Icon = cfg.icon;
-            const isViewed = viewedIds.includes(o.id);
             const isCorrect = correctIds.includes(o.id);
-            const isWrongAttempt = isViewed && !isCorrect;
+            const isWrong = wrongIds.includes(o.id) && !isCorrect;
             return (
               <Card
                 key={o.id}
-                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isCorrect ? "ring-2 ring-success/40 border-success/50" : isWrongAttempt ? "ring-2 ring-destructive/40 border-destructive/50" : ""}`}
+                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isCorrect ? "ring-2 ring-success/40 border-success/50" : isWrong ? "ring-2 ring-destructive/40 border-destructive/50" : ""}`}
                 onClick={() => openOrder(o)}
                 role="button"
                 tabIndex={0}
@@ -119,7 +127,7 @@ const Orders = () => {
                     <CardTitle className="text-lg">{o.title_he}</CardTitle>
                   </div>
                   {isCorrect && <CheckCircle className="h-5 w-5 text-success shrink-0" />}
-                  {isWrongAttempt && <XCircle className="h-5 w-5 text-destructive shrink-0" />}
+                  {isWrong && <XCircle className="h-5 w-5 text-destructive shrink-0" />}
                 </CardHeader>
               </Card>
             );
@@ -184,7 +192,7 @@ const Orders = () => {
                       <Button
                         key={i}
                         variant={miniChoice === i ? "default" : "outline"}
-                        className={`w-full text-right justify-start h-auto py-2 px-3 ${miniChoice === i ? "bg-primary text-primary-foreground dark:bg-accent dark:text-accent-foreground hover:bg-primary/90 dark:hover:bg-accent/90" : ""}`}
+                        className={`w-full text-right justify-start h-auto py-2 px-3 ${miniChoice === i ? "bg-primary text-primary-foreground hover:bg-primary/90" : "hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
                         onClick={() => {
                           setMiniChoice(i);
                           setMiniScenarioError(false);
@@ -195,6 +203,12 @@ const Orders = () => {
                             if (fb) {
                               if (correctIdx !== null && correctIdx !== undefined && i !== correctIdx) {
                                 setHadWrongAttempt(true);
+                                // Track wrong attempt for card status
+                                if (user && selected && !wrongIds.includes(selected.id)) {
+                                  const updatedWrong = [...wrongIds, selected.id];
+                                  setWrongIds(updatedWrong);
+                                  localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+                                }
                                 setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
                               } else {
                                 setFeedbackModal(fb);

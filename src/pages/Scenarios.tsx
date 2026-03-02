@@ -179,7 +179,7 @@ const Scenarios = () => {
             {chosenIdx === null && !completedIds.has(scenario.id) && (
               <div className="space-y-2">
                 {choices.map((c, i) => (
-                  <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground dark:hover:bg-accent dark:hover:text-accent-foreground" onClick={() => setChosenIdx(i)}>
+                  <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground hover:border-primary" onClick={() => setChosenIdx(i)}>
                     {c}
                   </Button>
                 ))}
@@ -191,7 +191,7 @@ const Scenarios = () => {
                 <p className="text-sm text-muted-foreground text-center">תרחיש זה הושלם. בחר שוב או המשך הלאה.</p>
                 <div className="space-y-2">
                   {choices.map((c, i) => (
-                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground dark:hover:bg-accent dark:hover:text-accent-foreground" onClick={() => setChosenIdx(i)}>
+                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground hover:border-primary" onClick={() => setChosenIdx(i)}>
                       {c}
                     </Button>
                   ))}
