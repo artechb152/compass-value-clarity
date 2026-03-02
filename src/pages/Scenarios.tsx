@@ -163,7 +163,7 @@ const Scenarios = () => {
           <span className="text-xs text-muted-foreground whitespace-nowrap">{completedCount}/{SCENARIOS_PER_USER}</span>
         </div>
 
-        <Card className="mb-4">
+        <Card className="mb-4 max-w-lg mx-auto">
           <CardHeader className="p-3 sm:p-6">
             <CardTitle className="text-base sm:text-lg leading-snug break-words">{scenario.title_he}</CardTitle>
           </CardHeader>
