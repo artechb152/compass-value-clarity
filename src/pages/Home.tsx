@@ -103,7 +103,7 @@ const Home = () => {
             const label = isDone ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
             return (
               <Link to={mod.to} key={mod.key}>
-                <Card className={`hover:shadow-lg transition-shadow mb-2`}>
+                <Card className="group hover:shadow-lg transition-shadow mb-2">
                   <CardHeader className="pb-2 flex-row items-center gap-3">
                     <div className="bg-primary/10 p-2 rounded-lg">
                       <mod.icon className="h-6 w-6 text-primary" />
@@ -115,7 +115,7 @@ const Home = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-3">
-                      <SegmentedProgress completed={prog.completed} total={prog.total} />
+                      <SegmentedProgress completed={prog.completed} total={prog.total} className="group-hover:bg-primary/30" />
                       <span className={`text-xs whitespace-nowrap ${isDone ? "text-success font-medium" : "text-muted-foreground"}`}>{label}</span>
                     </div>
                   </CardContent>
