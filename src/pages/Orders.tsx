@@ -26,6 +26,7 @@ const Orders = () => {
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
+  const [correctIds, setCorrectIds] = useState<string[]>([]);
   const [miniScenarioError, setMiniScenarioError] = useState(false);
 
   useEffect(() => {
@@ -33,6 +34,8 @@ const Orders = () => {
     if (user) {
       const stored = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
       setViewedIds(stored);
+      const storedCorrect = JSON.parse(localStorage.getItem(`correct_orders_${user.id}`) || "[]");
+      setCorrectIds(storedCorrect);
       supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
     }
   }, [user]);
@@ -45,19 +48,24 @@ const Orders = () => {
       const updated = [...viewedIds, o.id];
       setViewedIds(updated);
       localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updated));
-      if (updated.length >= orders.length && orders.length > 0) {
-        supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
-      }
     }
   };
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
-      // Block closing if scenario not answered correctly
       const correctIdx = (selected as any)?.mini_correct_index;
       if (selected && (miniChoice === null || (correctIdx !== null && correctIdx !== undefined && miniChoice !== correctIdx))) {
         setMiniScenarioError(true);
         return;
+      }
+      // Mark as correctly answered
+      if (user && selected && !correctIds.includes(selected.id)) {
+        const updated = [...correctIds, selected.id];
+        setCorrectIds(updated);
+        localStorage.setItem(`correct_orders_${user.id}`, JSON.stringify(updated));
+        if (updated.length >= orders.length && orders.length > 0) {
+          supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
+        }
       }
       setSelected(null);
       setMiniScenarioError(false);
@@ -80,8 +88,8 @@ const Orders = () => {
         </div>
 
         <div className="flex items-center gap-3 mb-6">
-          <SegmentedProgress completed={viewedIds.length} total={orders.length || 3} />
-          <span className="text-xs text-muted-foreground whitespace-nowrap">{viewedIds.length}/{orders.length}</span>
+          <SegmentedProgress completed={correctIds.length} total={orders.length || 3} />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{correctIds.length}/{orders.length}</span>
         </div>
 
         <div className="space-y-4">
@@ -89,10 +97,12 @@ const Orders = () => {
             const cfg = typeConfig[o.type] || typeConfig.legal;
             const Icon = cfg.icon;
             const isViewed = viewedIds.includes(o.id);
+            const isCorrect = correctIds.includes(o.id);
+            const isWrongAttempt = isViewed && !isCorrect;
             return (
               <Card
                 key={o.id}
-                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isViewed ? "ring-2 ring-success/40 border-success/50" : ""}`}
+                className={`cursor-pointer hover:shadow-lg transition-all ${cfg.bgColor} border ${isCorrect ? "ring-2 ring-success/40 border-success/50" : isWrongAttempt ? "ring-2 ring-destructive/40 border-destructive/50" : ""}`}
                 onClick={() => openOrder(o)}
                 role="button"
                 tabIndex={0}
@@ -103,7 +113,8 @@ const Orders = () => {
                   <div className="flex-1">
                     <CardTitle className="text-lg">{o.title_he}</CardTitle>
                   </div>
-                  {isViewed && <CheckCircle className="h-5 w-5 text-success shrink-0" />}
+                  {isCorrect && <CheckCircle className="h-5 w-5 text-success shrink-0" />}
+                  {isWrongAttempt && <XCircle className="h-5 w-5 text-destructive shrink-0" />}
                 </CardHeader>
               </Card>
             );

@@ -215,7 +215,7 @@ const Scenarios = () => {
                     {conflicts.map((v) => (
                       <button
                         key={v}
-                        className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"}`}
+                        className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15 hover:text-primary hover:border-primary/30"}`}
                         onClick={() => toggleValue(v)}
                       >
                         {v}
@@ -241,7 +241,7 @@ const Scenarios = () => {
 
                 <div>
                   <p className="text-sm font-medium mb-1">משפט אחד לעצמך ‑ מה אתה לוקח מהסיטואציה?</p>
-                  <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} />
+                  <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} className="resize-none" />
                 </div>
 
                 <Button variant="outline" onClick={handleSubmit} className="w-full hover:bg-primary hover:text-primary-foreground" disabled={!canShowSummary}>
