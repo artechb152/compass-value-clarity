@@ -67,7 +67,6 @@ const Scenarios = () => {
   useEffect(() => {
     if (initialIdxSet || scenarios.length === 0) return;
     if (completedIds.size === 0 && allScenarios.length > 0) {
-      // DB load returned no completed - start at 0
       setCurrentIdx(0);
       setInitialIdxSet(true);
       return;
@@ -76,7 +75,7 @@ const Scenarios = () => {
     if (firstIncomplete >= 0) {
       setCurrentIdx(firstIncomplete);
     } else {
-      setCurrentIdx(0); // all done, show first
+      setCurrentIdx(0);
     }
     setInitialIdxSet(true);
   }, [scenarios, completedIds, initialIdxSet, allScenarios.length]);
@@ -99,7 +98,6 @@ const Scenarios = () => {
 
   const handleSubmit = async () => {
     if (!user) return;
-    // Convert 1-10 scale to 0-100 for storage
     await supabase.from("responses").insert({
       user_id: user.id,
       scenario_id: scenario.id,
@@ -124,7 +122,6 @@ const Scenarios = () => {
 
   const goNext = () => {
     setShowSummaryModal(false);
-    // Check if all 8 are done
     const allDone = scenarios.every(s => completedIds.has(s.id));
     if (allDone) {
       setShowCompletionDialog(true);
@@ -182,16 +179,13 @@ const Scenarios = () => {
             )}
 
             {chosenIdx === null && !completedIds.has(scenario.id) && (
-              <>
-                <p className="text-sm font-medium text-primary mb-3">רגע לפני שאתה בוחר ‑ איזה ערכים מתנגשים לך בראש?</p>
-                <div className="space-y-2">
-                  {choices.map((c, i) => (
-                    <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground" onClick={() => setChosenIdx(i)}>
-                      {c}
-                    </Button>
-                  ))}
-                </div>
-              </>
+              <div className="space-y-2">
+                {choices.map((c, i) => (
+                  <Button key={i} variant="outline" className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug break-words whitespace-normal hover:bg-primary hover:text-primary-foreground" onClick={() => setChosenIdx(i)}>
+                    {c}
+                  </Button>
+                ))}
+              </div>
             )}
 
             {completedIds.has(scenario.id) && chosenIdx === null && (
