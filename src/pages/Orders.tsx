@@ -68,23 +68,9 @@ const Orders = () => {
     setIsCurrentCorrect(isCorrect);
     setMiniScenarioError(false);
 
-    // Get feedback text
-    const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
-    if (feedbacks) {
-      const fb = feedbacks.find(f => f.choice_index === i);
-      if (fb) {
-        if (!isCorrect) {
-          setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
-          setFeedbackIsCorrect(false);
-        }
-        // Correct answer: no popup, just show green button
-      }
-    }
-
     // Update card status
     if (user) {
       if (isCorrect) {
-        // Add to correct, remove from wrong
         if (!correctIds.includes(selected.id)) {
           const updated = [...correctIds, selected.id];
           setCorrectIds(updated);
@@ -98,12 +84,22 @@ const Orders = () => {
           setWrongIds(updatedWrong);
           localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
         }
+        // Auto-close dialog after correct answer
+        setTimeout(() => setSelected(null), 600);
       } else {
-        // Add to wrong (only if not already correct)
         if (!correctIds.includes(selected.id) && !wrongIds.includes(selected.id)) {
           const updatedWrong = [...wrongIds, selected.id];
           setWrongIds(updatedWrong);
           localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+        }
+        // Show feedback for wrong answer
+        const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
+        if (feedbacks) {
+          const fb = feedbacks.find(f => f.choice_index === i);
+          if (fb) {
+            setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
+            setFeedbackIsCorrect(false);
+          }
         }
       }
     }
@@ -117,11 +113,6 @@ const Orders = () => {
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
-      // Must answer correctly before closing
-      if (selected && isCurrentCorrect !== true) {
-        setMiniScenarioError(true);
-        return;
-      }
       setSelected(null);
       setMiniScenarioError(false);
     }
