@@ -78,7 +78,7 @@ const Weekly = () => {
     }
     setTimeout(() => {
       navigate("/", { replace: true });
-    }, 2500);
+    }, 5000);
   };
 
   if (!poll) return <AppShell><div className="p-4 text-center text-muted-foreground">אין סקר שבועי כרגע</div></AppShell>;
