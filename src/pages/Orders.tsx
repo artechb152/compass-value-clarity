@@ -188,11 +188,16 @@ const Orders = () => {
                     <p className="text-xs text-destructive mb-2 font-medium">תשובה לא נכונה, נסה שוב</p>
                   )}
                   <div className="space-y-2">
-                    {(selected.mini_choices_json as string[] || []).map((choice, i) => (
+                    {(selected.mini_choices_json as string[] || []).map((choice, i) => {
+                      const correctIdx = selected.mini_correct_index;
+                      const isSelected = miniChoice === i;
+                      const isCorrectChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i === correctIdx;
+                      const isWrongChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i !== correctIdx;
+                      return (
                       <Button
                         key={i}
-                        variant={miniChoice === i ? "default" : "outline"}
-                        className={`w-full text-right justify-start h-auto py-2 px-3 ${miniChoice === i ? "bg-primary text-primary-foreground hover:bg-primary/90" : "hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
+                        variant={isSelected ? "default" : "outline"}
+                        className={`w-full text-right justify-start h-auto py-2 px-3 ${isCorrectChoice ? "bg-success text-success-foreground hover:bg-success/90 border-success" : isWrongChoice ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive" : isSelected ? "bg-primary text-primary-foreground hover:bg-primary/90" : "hover:bg-primary hover:text-primary-foreground hover:border-primary"}`}
                         onClick={() => {
                           setMiniChoice(i);
                           setMiniScenarioError(false);
@@ -219,7 +224,8 @@ const Orders = () => {
                       >
                         {choice}
                       </Button>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
