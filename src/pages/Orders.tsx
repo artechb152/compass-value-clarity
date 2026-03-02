@@ -197,7 +197,13 @@ const Orders = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!feedbackModal} onOpenChange={() => setFeedbackModal(null)}>
+      <Dialog open={!!feedbackModal} onOpenChange={(open) => {
+        if (!open) {
+          const isWrong = selected && feedbackModal && selected.mini_correct_index !== null && selected.mini_correct_index !== undefined && feedbackModal.choice_index !== selected.mini_correct_index;
+          setFeedbackModal(null);
+          if (isWrong) setMiniChoice(null);
+        }
+      }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl" role="dialog" aria-modal="true">
           {feedbackModal && (
             <>
