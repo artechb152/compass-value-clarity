@@ -31,7 +31,6 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-10 w-auto" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" align="end" sideOffset={4}><p>חזרה</p></TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <div className="flex items-center gap-1">

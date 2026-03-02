@@ -197,7 +197,7 @@ const Scenarios = () => {
                   ))}
                 </div>
                 <Button variant="secondary" onClick={goNext} className="w-full">
-                  {currentIdx !== null && currentIdx < scenarios.length - 1 ? "← ממשיכים לתרחיש הבא" : "סיום"}
+                  {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא ←" : "סיום"}
                 </Button>
               </div>
             )}
@@ -270,7 +270,7 @@ const Scenarios = () => {
             )}
           </div>
           <Button onClick={goNext} className="w-full mt-2">
-            {currentIdx < scenarios.length - 1 ? "← ממשיכים לתרחיש הבא" : "סיום"}
+            {currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא ←" : "סיום"}
           </Button>
         </DialogContent>
       </Dialog>
