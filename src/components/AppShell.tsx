@@ -38,7 +38,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground transition-transform hover:scale-110" aria-label="החלף מצב תצוגה">
+                <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="text-primary-foreground hover:bg-accent hover:text-accent-foreground transition-transform hover:scale-110" aria-label="החלף מצב תצוגה">
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
               </TooltipTrigger>
@@ -46,14 +46,14 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </Tooltip>
           </TooltipProvider>
           {isAdmin && (
-            <Button variant="ghost" size="sm" asChild className="text-primary-foreground hover:bg-primary/80 transition-transform hover:scale-110">
+            <Button variant="ghost" size="sm" asChild className="text-primary-foreground hover:bg-accent hover:text-accent-foreground transition-transform hover:scale-110">
               <Link to="/admin"><Settings className="h-4 w-4" /></Link>
             </Button>
           )}
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={signOut} className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground focus:ring-2 focus:ring-primary-foreground/50 focus:ring-offset-0 transition-transform hover:scale-110" aria-label="התנתק">
+                <Button variant="ghost" size="icon" onClick={signOut} className="text-primary-foreground hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-primary-foreground/50 focus:ring-offset-0 transition-transform hover:scale-110" aria-label="התנתק">
                   <LogOut className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>

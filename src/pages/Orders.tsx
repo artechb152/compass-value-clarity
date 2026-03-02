@@ -28,6 +28,7 @@ const Orders = () => {
   const [viewedIds, setViewedIds] = useState<string[]>([]);
   const [correctIds, setCorrectIds] = useState<string[]>([]);
   const [miniScenarioError, setMiniScenarioError] = useState(false);
+  const [hadWrongAttempt, setHadWrongAttempt] = useState(false);
 
   useEffect(() => {
     supabase.from("orders").select("*").then(({ data }) => data && setOrders(data));
@@ -44,6 +45,7 @@ const Orders = () => {
     setSelected(o);
     setMiniChoice(null);
     setMiniScenarioError(false);
+    setHadWrongAttempt(false);
     if (user && !viewedIds.includes(o.id)) {
       const updated = [...viewedIds, o.id];
       setViewedIds(updated);
@@ -58,8 +60,8 @@ const Orders = () => {
         setMiniScenarioError(true);
         return;
       }
-      // Mark as correctly answered
-      if (user && selected && !correctIds.includes(selected.id)) {
+      // Mark as correctly answered only if no wrong attempts in this session
+      if (user && selected && !correctIds.includes(selected.id) && !hadWrongAttempt) {
         const updated = [...correctIds, selected.id];
         setCorrectIds(updated);
         localStorage.setItem(`correct_orders_${user.id}`, JSON.stringify(updated));
@@ -189,6 +191,7 @@ const Orders = () => {
                             const fb = feedbacks.find(f => f.choice_index === i);
                             if (fb) {
                               if (correctIdx !== null && correctIdx !== undefined && i !== correctIdx) {
+                                setHadWrongAttempt(true);
                                 setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
                               } else {
                                 setFeedbackModal(fb);
