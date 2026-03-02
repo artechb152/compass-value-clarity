@@ -6,8 +6,9 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Trophy } from "lucide-react";
 import type { Tables, Json } from "@/integrations/supabase/types";
 
 // Get current ISO week key
@@ -35,6 +36,7 @@ const Weekly = () => {
   const [voted, setVoted] = useState(false);
   const [myVote, setMyVote] = useState<number | null>(null);
   const [results, setResults] = useState<{ option_index: number; count: number }[]>([]);
+  const [showCompletion, setShowCompletion] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -70,15 +72,19 @@ const Weekly = () => {
     toast.success("ההצבעה נשמרה!");
     const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: poll.id });
     if (res) setResults(res as any);
-    // Navigate to home and trigger final completion popup
+    // Show completion popup after a short delay
+    setTimeout(() => {
+      setShowCompletion(true);
+    }, 3000);
+  };
+
+  const handleFinish = () => {
+    setShowCompletion(false);
     if (user) {
       sessionStorage.removeItem(`final_completion_shown_${user.id}`);
-      // Ensure intro gate won't redirect away from home
       sessionStorage.setItem(`intro_seen_this_session_${user.id}`, "1");
     }
-    setTimeout(() => {
-      navigate("/", { replace: true });
-    }, 5000);
+    navigate("/", { replace: true });
   };
 
   if (!poll) return <AppShell><div className="p-4 text-center text-muted-foreground">אין סקר שבועי כרגע</div></AppShell>;
@@ -130,6 +136,21 @@ const Weekly = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={showCompletion} onOpenChange={(open) => { if (!open) handleFinish(); }}>
+        <DialogContent className="max-w-sm [direction:rtl]" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
+            <DialogDescription className="text-base mt-2 text-right">
+              סיימת את דילמת השבוע. חזרה למסך הבית.
+            </DialogDescription>
+          </DialogHeader>
+          <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
+          <Button onClick={handleFinish} className="w-full" size="lg">
+            סיום
+          </Button>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 };
