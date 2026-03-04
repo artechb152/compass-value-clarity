@@ -18,7 +18,7 @@ const Login = () => {
   const [courseName, setCourseName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (user) return <Navigate to="/intro" replace />;
+  if (user) return <Navigate to="/" replace />;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,6 @@ const Login = () => {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (signInError) {
-        // New user – sign up
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -48,11 +47,6 @@ const Login = () => {
 
         const { error: autoSignIn } = await supabase.auth.signInWithPassword({ email, password });
         if (autoSignIn) throw autoSignIn;
-        // First time login – no resume popup
-        sessionStorage.setItem("is_returning_user", "false");
-      } else {
-        // Existing user (same ID number logged in before)
-        sessionStorage.setItem("is_returning_user", "true");
       }
 
       const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -96,7 +90,7 @@ const Login = () => {
               <Input id="courseName" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} placeholder="קורס קצינים" className="placeholder:text-muted-foreground/40" required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "נכנס/ת..." : "כניסה"}
+              {loading ? "נכנס..." : "כניסה"}
             </Button>
           </form>
         </CardContent>

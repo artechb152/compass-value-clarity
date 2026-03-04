@@ -33,6 +33,7 @@ const Scenarios = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [allScenarios, setAllScenarios] = useState<Tables<"scenarios">[]>([]);
+  const [allValues, setAllValues] = useState<{ id: string; title_he: string }[]>([]);
   const [currentIdx, setCurrentIdx] = useState<number | null>(null);
   const [initialIdxSet, setInitialIdxSet] = useState(false);
   const [chosenIdx, setChosenIdx] = useState<number | null>(null);
@@ -46,6 +47,7 @@ const Scenarios = () => {
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
+    supabase.from("values").select("id, title_he").order("display_order", { ascending: true }).then(({ data }) => data && setAllValues(data));
     if (user) {
       supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
       supabase.from("responses").select("scenario_id").eq("user_id", user.id).then(({ data }) => {
@@ -84,16 +86,28 @@ const Scenarios = () => {
 
   const choices = (scenario.choices_json as string[]) || [];
   const feedbacks = (scenario.feedback_json as string[]) || [];
-  const conflicts = (scenario.value_conflicts_json as string[]) || [];
   const contextHe = (scenario as any).context_he as string | null;
   const dilemmaQuestion = (scenario as any).dilemma_question_he as string | null;
   const closingFeedback = (scenario as any).closing_feedback_json as any;
 
+  // Use all 11 values from DB for value selection chips
+  const valueNames = allValues.map(v => v.title_he);
+
   const toggleValue = (v: string) => {
-    setSelectedValues((prev) => prev.includes(v) ? prev.filter((x) => x !== v) : prev.length < 2 ? [...prev, v] : prev);
+    setSelectedValues((prev) => {
+      if (prev.includes(v)) {
+        // Remove value and reset its impact
+        setValueImpacts(impacts => {
+          const copy = { ...impacts };
+          delete copy[v];
+          return copy;
+        });
+        return prev.filter((x) => x !== v);
+      }
+      return prev.length < 2 ? [...prev, v] : prev;
+    });
   };
 
-  const impactValues = conflicts.slice(0, 3);
   const canShowSummary = chosenIdx !== null && selectedValues.length === 2 && reflection.trim().length >= 1;
 
   const handleSubmit = async () => {
@@ -141,10 +155,8 @@ const Scenarios = () => {
   };
 
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
-  const progressPct = Math.round((completedCount / SCENARIOS_PER_USER) * 100);
 
   const choiceLabel = chosenIdx !== null ? choices[chosenIdx] : "";
-  const valuesLabel = selectedValues.join(" ו-");
 
   return (
     <AppShell>
@@ -212,10 +224,10 @@ const Scenarios = () => {
                 <div>
                   <p className="text-sm font-medium mb-2">בחר 2 ערכים שהתנגשו פה:</p>
                   <div className="flex flex-wrap gap-2">
-                    {conflicts.map((v) => (
+                    {valueNames.map((v) => (
                       <button
                         key={v}
-                        className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15 hover:text-primary hover:border-primary/30"}`}
+                        className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15 hover:text-primary hover:border-primary/30"}`}
                         onClick={() => toggleValue(v)}
                       >
                         {v}
@@ -224,23 +236,31 @@ const Scenarios = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <p className="text-sm font-medium text-foreground">כמה לפי דעתך הערכים באו לידי פגיעה:</p>
-                  {impactValues.map((val) => (
-                    <div key={val}>
-                      <p className="text-xs font-medium text-foreground mb-2">{val}</p>
-                      <Slider value={[valueImpacts[val] ?? 5]} onValueChange={(v) => setValueImpacts(prev => ({ ...prev, [val]: v[0] }))} min={1} max={10} step={1} aria-label={`מידת פגיעה: ${val}`} />
-                      <div className="flex justify-between text-[10px] text-muted-foreground mt-1" dir="ltr">
-                        {Array.from({ length: 10 }, (_, i) => (
-                          <span key={i}>{i + 1}</span>
-                        ))}
+                {/* Dynamic sliders based on selected values */}
+                {selectedValues.length === 2 && (
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium text-foreground">כמה לפי דעתך הערכים באו לידי פגיעה:</p>
+                    {selectedValues.map((val) => (
+                      <div key={val}>
+                        <p className="text-xs font-medium text-foreground mb-2">{val}</p>
+                        <Slider
+                          value={[valueImpacts[val] ?? 5]}
+                          onValueChange={(v) => setValueImpacts(prev => ({ ...prev, [val]: v[0] }))}
+                          min={1} max={10} step={1}
+                          aria-label={`מידת פגיעה: ${val}`}
+                          className="h-2"
+                        />
+                        <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                          <span>לא מסכים</span>
+                          <span>מסכים מאוד</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
 
                 <div>
-                  <p className="text-sm font-medium mb-1">משפט אחד לעצמך ‑ מה אתה לוקח מהסיטואציה?</p>
+                  <p className="text-sm font-medium mb-1">משפט אחד לעצמך - מה אתה לוקח מהסיטואציה?</p>
                   <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={scenario.reflection_question_he || ""} rows={2} className="resize-none" />
                 </div>
 
@@ -262,7 +282,7 @@ const Scenarios = () => {
           </DialogHeader>
           <div className="space-y-3 text-sm text-right">
             <p>• <strong>בחרת:</strong> {choiceLabel}</p>
-            <p>• <strong>ערכים שהתנגשו:</strong> {selectedValues.join(" ו‑")}</p>
+            <p>• <strong>ערכים שהתנגשו:</strong> {selectedValues.join(" ו-")}</p>
             <p>• <strong>מידת פגיעה בערכים:</strong> {Object.entries(valueImpacts).map(([k, v]) => `${k} (${v})`).join(", ")}</p>
             {reflection && <p>• <strong>השורה שלך:</strong> "{reflection}"</p>}
             {closingFeedback?.summary_text && (
@@ -270,7 +290,7 @@ const Scenarios = () => {
             )}
           </div>
           <Button onClick={goNext} className="w-full mt-2">
-            {currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא ←" : "סיום"}
+            {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לתרחיש הבא ←" : "סיום"}
           </Button>
         </DialogContent>
       </Dialog>

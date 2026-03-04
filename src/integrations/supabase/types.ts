@@ -267,32 +267,38 @@ export type Database = {
       }
       values: {
         Row: {
+          display_order: number | null
           example_safe_he: string | null
           id: string
           official_definition_he: string | null
           quick_exercise_question_he: string | null
           source_url: string | null
           title_he: string
+          video_url: string | null
           what_it_means_in_practice_he: string | null
           youth_microcopy_he: string | null
         }
         Insert: {
+          display_order?: number | null
           example_safe_he?: string | null
           id: string
           official_definition_he?: string | null
           quick_exercise_question_he?: string | null
           source_url?: string | null
           title_he: string
+          video_url?: string | null
           what_it_means_in_practice_he?: string | null
           youth_microcopy_he?: string | null
         }
         Update: {
+          display_order?: number | null
           example_safe_he?: string | null
           id?: string
           official_definition_he?: string | null
           quick_exercise_question_he?: string | null
           source_url?: string | null
           title_he?: string
+          video_url?: string | null
           what_it_means_in_practice_he?: string | null
           youth_microcopy_he?: string | null
         }

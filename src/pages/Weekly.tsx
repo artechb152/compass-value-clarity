@@ -11,13 +11,11 @@ import { toast } from "sonner";
 import { ArrowRight, Trophy } from "lucide-react";
 import type { Tables, Json } from "@/integrations/supabase/types";
 
-// Get current day key for daily rotation
 function getCurrentDayKey(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-// Deterministic hash to pick a poll for a user+week combo
 function hashSeed(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -37,13 +35,10 @@ const Weekly = () => {
 
   useEffect(() => {
     const load = async () => {
-      // Get all BANK polls
       const { data: allPolls } = await supabase.from("weekly_polls").select("*");
       if (!allPolls?.length) return;
 
       const dayKey = getCurrentDayKey();
-
-      // Pick a random poll per user per day using hash
       const seed = `${user?.id || "anon"}-${dayKey}`;
       const idx = hashSeed(seed) % allPolls.length;
       const p = allPolls[idx];
@@ -69,17 +64,13 @@ const Weekly = () => {
     toast.success("ההצבעה נשמרה!");
     const { data: res } = await supabase.rpc("get_poll_results", { p_poll_id: poll.id });
     if (res) setResults(res as any);
-    // Show completion popup after a short delay
-    setTimeout(() => {
-      setShowCompletion(true);
-    }, 3000);
+    setTimeout(() => setShowCompletion(true), 3000);
   };
 
   const handleFinish = () => {
     setShowCompletion(false);
     if (user) {
       sessionStorage.removeItem(`final_completion_shown_${user.id}`);
-      sessionStorage.setItem(`intro_seen_this_session_${user.id}`, "1");
     }
     navigate("/", { replace: true });
   };
@@ -98,7 +89,7 @@ const Weekly = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-primary">דילמת השבוע</h1>
-            <p className="text-muted-foreground text-sm">הצבעה אנונימית ‑ פעם אחת לסקר</p>
+            <p className="text-muted-foreground text-sm">הצבעה אנונימית - פעם אחת לסקר</p>
           </div>
         </div>
 
