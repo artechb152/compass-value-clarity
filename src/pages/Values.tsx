@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import SegmentedProgress from "@/components/SegmentedProgress";
-import { ExternalLink, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
+import { ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const Values = () => {
@@ -15,13 +15,12 @@ const Values = () => {
   const navigate = useNavigate();
   const [values, setValues] = useState<Tables<"values">[]>([]);
   const [selected, setSelected] = useState<Tables<"values"> | null>(null);
-  const [selectedConflicts, setSelectedConflicts] = useState<string[]>([]);
   const [viewedIds, setViewedIds] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
   useEffect(() => {
-    supabase.from("values").select("*").then(({ data }) => data && setValues(data));
+    supabase.from("values").select("*").order("display_order", { ascending: true }).then(({ data }) => data && setValues(data));
     if (user) {
       const stored = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
       setViewedIds(stored);
@@ -31,7 +30,6 @@ const Values = () => {
 
   const openValue = (v: Tables<"values">) => {
     setSelected(v);
-    setSelectedConflicts([]);
     if (user && !viewedIds.includes(v.id)) {
       const updated = [...viewedIds, v.id];
       setViewedIds(updated);
@@ -52,12 +50,6 @@ const Values = () => {
         }
       }
     }
-  };
-
-  const toggleConflict = (title: string) => {
-    setSelectedConflicts((prev) =>
-      prev.includes(title) ? prev.filter((v) => v !== title) : prev.length < 2 ? [...prev, title] : prev
-    );
   };
 
   const progressPct = values.length > 0 ? Math.round((viewedIds.length / values.length) * 100) : 0;
@@ -89,7 +81,7 @@ const Values = () => {
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-primary">רוח צה״ל ‑ הערכים</h1>
+            <h1 className="text-2xl font-bold text-primary">רוח צה״ל - הערכים</h1>
             <p className="text-muted-foreground text-sm">11 ערכי יסוד. לחץ על ערך כדי ללמוד ולתרגל.</p>
           </div>
         </div>
@@ -143,17 +135,28 @@ const Values = () => {
               <div>
                 <h3 className="font-semibold text-sm text-primary mb-1">ההגדרה הרשמית</h3>
                 <p className="text-sm leading-relaxed">{selected.official_definition_he}</p>
-                {selected.source_url && (
-                  <a href={selected.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
-                    מקור <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
               </div>
 
               {(selected as any).what_it_means_in_practice_he && (
                 <div className="bg-muted/50 rounded-lg p-3">
                   <h3 className="font-semibold text-sm text-primary mb-1">מה זה אומר בפועל?</h3>
                   <p className="text-sm">{(selected as any).what_it_means_in_practice_he}</p>
+                </div>
+              )}
+
+              {/* Embedded video if exists */}
+              {(selected as any).video_url && (
+                <div>
+                  <h3 className="font-semibold text-sm text-primary mb-1">סרטון</h3>
+                  <div className="relative aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      className="w-full h-full"
+                      src={(selected as any).video_url}
+                      title={`סרטון - ${selected.title_he}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
                 </div>
               )}
 
