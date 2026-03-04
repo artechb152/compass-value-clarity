@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppShell } from "@/components/AppShell";
@@ -7,10 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, Trophy } from "lucide-react";
+import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight, Trophy } from "lucide-react";
 
 const modules = [
-  { key: "values", title: "רוח צה״ל - הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
+  { key: "values", title: "רוח צה״ל ‑ הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
   { key: "orders", title: "פקודות", icon: Shield, to: "/orders", description: "חוקית / בלתי חוקית / בלתי חוקית בעליל", total: 3 },
   { key: "scenarios", title: "מעבדת דילמות", icon: FlaskConical, to: "/scenarios", description: "תרחישים אינטראקטיביים עם התנגשויות ערכיות", total: 8 },
 ];
@@ -20,10 +20,18 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [progressMap, setProgressMap] = useState<Record<string, { completed: number; total: number }>>({});
+  const [introChecked, setIntroChecked] = useState(false);
+  const [introCompleted, setIntroCompleted] = useState(true);
   const [showFinalCompletion, setShowFinalCompletion] = useState(false);
 
   useEffect(() => {
     if (!user) return;
+
+    const introSeenKey = `intro_seen_this_session_${user.id}`;
+    if (!sessionStorage.getItem(introSeenKey)) {
+      setIntroCompleted(false);
+    }
+    setIntroChecked(true);
 
     const loadProgress = async () => {
       const { data: responses } = await supabase.from("responses").select("scenario_id").eq("user_id", user.id);
@@ -62,17 +70,35 @@ const Home = () => {
     loadProgress();
   }, [user, location.key]);
 
+  if (!introChecked) {
+    return (
+      <AppShell>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (!introCompleted) {
+    return <Navigate to="/intro" replace />;
+  }
+
   return (
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto space-y-6">
-        <div className="text-center py-6">
+        <div className="text-center py-6 relative">
           <h1 className="text-3xl font-bold text-primary mb-1">רוח צה״ל</h1>
           <p className="text-muted-foreground">התנגשות בין ערכים</p>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/intro")} className="absolute top-[26px] right-0 hover:bg-primary [&:hover_svg]:text-white" aria-label="חזרה למסך הפתיחה">
+            <ArrowRight className="h-5 w-5 text-muted-foreground" />
+          </Button>
         </div>
 
         <div className="space-y-4">
           {modules.map((mod, i) => {
             const prog = progressMap[mod.key] || { completed: 0, total: mod.total };
+            const pct = Math.round((prog.completed / prog.total) * 100);
             const isDone = prog.completed >= prog.total;
             const label = isDone ? "הושלם ✓" : `${prog.completed}/${prog.total}`;
             return (
@@ -113,7 +139,7 @@ const Home = () => {
             <DialogHeader>
               <DialogTitle className="text-2xl text-right">סיימת בהצלחה!</DialogTitle>
               <DialogDescription className="text-base mt-2 text-right">
-                עברת את כל התכנים - ערכים, פקודות, דילמות ודילמת השבוע. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי בשטח.
+                עברת את כל התכנים ‑ ערכים, פקודות, דילמות ודילמת השבוע. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי בשטח.
               </DialogDescription>
             </DialogHeader>
             <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
