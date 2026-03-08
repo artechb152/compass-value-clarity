@@ -366,21 +366,6 @@ const Scenarios = () => {
               <p key={v}>- <strong>{v}:</strong> {scaleValues[v] ?? 5}/10</p>
             ))}
             {reflection && <p>- <strong>השיקול שלך:</strong> ״{reflection}״</p>}
-
-            {/* AI Conclusion */}
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mt-3">
-              <p className="text-sm font-bold text-foreground mb-1">מסקנה</p>
-              {loadingConclusion ? (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-xs">מייצר תובנה אישית...</span>
-                </div>
-              ) : conclusion ? (
-                <p className="text-sm leading-relaxed">{conclusion}</p>
-              ) : (
-                <p className="text-xs text-muted-foreground">לא הצלחנו לייצר מסקנה. המשך לדילמה הבאה.</p>
-              )}
-            </div>
           </div>
           <Button onClick={goNext} className="w-full mt-2">
             {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לדילמה הבאה" : "סיום"} <ArrowLeft className="h-4 w-4 mr-2" />
