@@ -257,7 +257,7 @@ const Orders = () => {
                     <ArrowRight className="h-4 w-4" />
                     <span>חזרה</span>
                   </Button>
-                  <Button onClick={() => setDialogPage("exercise")} className="flex-1 gap-2">
+                  <Button onClick={() => setDialogPage("exercise")} className={`flex-1 gap-2 transition-all ${exerciseButtonFlash ? "ring-2 ring-destructive animate-pulse" : ""}`}>
                     <span>לתרגיל</span>
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
