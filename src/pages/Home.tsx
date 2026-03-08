@@ -50,8 +50,8 @@ const Home = () => {
       const viewedValues = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
       map.values.completed = viewedValues.length;
 
-      const viewedOrders = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
-      map.orders.completed = viewedOrders.length;
+      const correctOrders = JSON.parse(localStorage.getItem(`correct_orders_${user.id}`) || "[]");
+      map.orders.completed = correctOrders.length;
 
       setProgressMap(map);
 
