@@ -224,7 +224,7 @@ const Orders = () => {
                   </ol>
                 </div>
 
-                <Button onClick={() => setDialogPage(selected.type === "manifestly_illegal" ? "story" : "exercise")} className="w-full gap-2">
+                <Button onClick={() => { setDialogPage(selected.type === "manifestly_illegal" ? "story" : "exercise"); setExerciseButtonFlash(false); }} className={`w-full gap-2 transition-all ${exerciseButtonFlash ? "ring-2 ring-destructive animate-pulse" : ""}`}>
                   <span>{selected.type === "manifestly_illegal" ? "לתוכן הבא" : "לתרגיל"}</span>
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
