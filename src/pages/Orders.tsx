@@ -115,8 +115,16 @@ const Orders = () => {
     setMiniChoice(null);
   };
 
+  const [exerciseButtonFlash, setExerciseButtonFlash] = useState(false);
+
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
+      // If on info page and haven't gone to exercise yet, flash the exercise button
+      if (dialogPage === "info" && selected) {
+        setExerciseButtonFlash(true);
+        setTimeout(() => setExerciseButtonFlash(false), 1500);
+        return;
+      }
       // On exercise page, block closing if not answered
       if (dialogPage === "exercise" && miniChoice === null) {
         setExerciseBlocked(true);
@@ -124,6 +132,7 @@ const Orders = () => {
       }
       setSelected(null);
       setExerciseBlocked(false);
+      setExerciseButtonFlash(false);
     }
   };
 
