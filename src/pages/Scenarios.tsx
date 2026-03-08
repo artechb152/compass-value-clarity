@@ -67,11 +67,11 @@ const Scenarios = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const checkScroll = useCallback(() => {
-    const el = contentRef.current;
-    if (!el) return;
-    const scrollBottom = window.innerHeight + window.scrollY;
-    const docHeight = document.documentElement.scrollHeight;
-    setShowScrollArrow(docHeight - scrollBottom > 80);
+    requestAnimationFrame(() => {
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      setShowScrollArrow(docHeight - scrollBottom > 80);
+    });
   }, []);
 
   useEffect(() => {
