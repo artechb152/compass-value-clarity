@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import SegmentedProgress from "@/components/SegmentedProgress";
-import { ExternalLink, AlertTriangle, CheckCircle, XCircle, ArrowRight } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 interface MiniFeedback { choice_index: number; title: string; text: string; }
@@ -23,20 +23,17 @@ const Orders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Tables<"orders">[]>([]);
   const [selected, setSelected] = useState<Tables<"orders"> | null>(null);
+  const [dialogPage, setDialogPage] = useState<"info" | "story" | "exercise">("info");
   const [miniChoice, setMiniChoice] = useState<number | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<MiniFeedback | null>(null);
   const [feedbackIsCorrect, setFeedbackIsCorrect] = useState<boolean>(false);
-  const [isCurrentCorrect, setIsCurrentCorrect] = useState<boolean | null>(null);
-  const [viewedIds, setViewedIds] = useState<string[]>([]);
   const [correctIds, setCorrectIds] = useState<string[]>([]);
   const [wrongIds, setWrongIds] = useState<string[]>([]);
-  const [miniScenarioError, setMiniScenarioError] = useState(false);
+  const [exerciseBlocked, setExerciseBlocked] = useState(false);
 
   useEffect(() => {
     supabase.from("orders").select("*").then(({ data }) => data && setOrders(data));
     if (user) {
-      const stored = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
-      setViewedIds(stored);
       const storedCorrect = JSON.parse(localStorage.getItem(`correct_orders_${user.id}`) || "[]");
       setCorrectIds(storedCorrect);
       const storedWrong = JSON.parse(localStorage.getItem(`wrong_orders_${user.id}`) || "[]");
@@ -47,59 +44,61 @@ const Orders = () => {
 
   const openOrder = (o: Tables<"orders">) => {
     setSelected(o);
+    setDialogPage("info");
     setMiniChoice(null);
     setFeedbackModal(null);
     setFeedbackIsCorrect(false);
-    setIsCurrentCorrect(null);
-    setMiniScenarioError(false);
-    if (user && !viewedIds.includes(o.id)) {
-      const updated = [...viewedIds, o.id];
-      setViewedIds(updated);
-      localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updated));
-    }
+    setExerciseBlocked(false);
   };
 
   const handleChoiceClick = (i: number) => {
-    if (!selected) return;
+    if (!selected || !user) return;
     const correctIdx = selected.mini_correct_index;
     const isCorrect = correctIdx !== null && correctIdx !== undefined && i === correctIdx;
 
     setMiniChoice(i);
-    setIsCurrentCorrect(isCorrect);
-    setMiniScenarioError(false);
+    setExerciseBlocked(false);
 
-    // Update card status
-    if (user) {
-      if (isCorrect) {
-        if (!correctIds.includes(selected.id)) {
-          const updated = [...correctIds, selected.id];
-          setCorrectIds(updated);
-          localStorage.setItem(`correct_orders_${user.id}`, JSON.stringify(updated));
-          if (updated.length >= orders.length && orders.length > 0) {
-            supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
-          }
+    if (isCorrect) {
+      if (!correctIds.includes(selected.id)) {
+        const updated = [...correctIds, selected.id];
+        setCorrectIds(updated);
+        localStorage.setItem(`correct_orders_${user.id}`, JSON.stringify(updated));
+        // Also update viewed
+        const viewedIds = JSON.parse(localStorage.getItem(`viewed_orders_${user.id}`) || "[]");
+        if (!viewedIds.includes(selected.id)) {
+          const updatedViewed = [...viewedIds, selected.id];
+          localStorage.setItem(`viewed_orders_${user.id}`, JSON.stringify(updatedViewed));
         }
-        if (wrongIds.includes(selected.id)) {
-          const updatedWrong = wrongIds.filter(id => id !== selected.id);
-          setWrongIds(updatedWrong);
-          localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+        if (updated.length >= orders.length && orders.length > 0) {
+          supabase.from("progress").upsert({ user_id: user.id, module_key: "orders", status: "completed", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
         }
-        // Auto-close dialog after correct answer
-        setTimeout(() => setSelected(null), 600);
-      } else {
-        if (!correctIds.includes(selected.id) && !wrongIds.includes(selected.id)) {
-          const updatedWrong = [...wrongIds, selected.id];
-          setWrongIds(updatedWrong);
-          localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+      }
+      if (wrongIds.includes(selected.id)) {
+        const updatedWrong = wrongIds.filter(id => id !== selected.id);
+        setWrongIds(updatedWrong);
+        localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+      }
+      // Auto-close after correct answer and check if all done
+      setTimeout(() => {
+        setSelected(null);
+        const updatedCorrect = [...new Set([...correctIds, selected.id])];
+        if (updatedCorrect.length >= orders.length && orders.length > 0) {
+          navigate("/");
         }
-        // Show feedback for wrong answer
-        const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
-        if (feedbacks) {
-          const fb = feedbacks.find(f => f.choice_index === i);
-          if (fb) {
-            setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
-            setFeedbackIsCorrect(false);
-          }
+      }, 600);
+    } else {
+      if (!correctIds.includes(selected.id) && !wrongIds.includes(selected.id)) {
+        const updatedWrong = [...wrongIds, selected.id];
+        setWrongIds(updatedWrong);
+        localStorage.setItem(`wrong_orders_${user.id}`, JSON.stringify(updatedWrong));
+      }
+      const feedbacks = (selected as any).mini_feedback_json as MiniFeedback[] | null;
+      if (feedbacks) {
+        const fb = feedbacks.find(f => f.choice_index === i);
+        if (fb) {
+          setFeedbackModal({ ...fb, title: fb.title || "לא מדויק" });
+          setFeedbackIsCorrect(false);
         }
       }
     }
@@ -108,13 +107,17 @@ const Orders = () => {
   const handleRetry = () => {
     setFeedbackModal(null);
     setMiniChoice(null);
-    setIsCurrentCorrect(null);
   };
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
+      // On exercise page, block closing if not answered
+      if (dialogPage === "exercise" && miniChoice === null) {
+        setExerciseBlocked(true);
+        return;
+      }
       setSelected(null);
-      setMiniScenarioError(false);
+      setExerciseBlocked(false);
     }
   };
 
@@ -165,9 +168,10 @@ const Orders = () => {
         </div>
       </div>
 
+      {/* Order Dialog - 2 pages: info + exercise */}
       <Dialog open={!!selected} onOpenChange={handleCloseOrder}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
-          {selected && (
+        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide transition-all ${exerciseBlocked ? "ring-2 ring-destructive" : ""}`} dir="rtl">
+          {selected && dialogPage === "info" && (
             <>
               <DialogHeader className="text-right">
                 <DialogTitle className="text-xl text-right">{selected.title_he}</DialogTitle>
@@ -176,15 +180,11 @@ const Orders = () => {
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-sm text-primary mb-1">הגדרה רשמית</h3>
+                  <h3 className="font-semibold text-sm text-primary mb-1">הגדרה</h3>
                   <p className="text-sm leading-relaxed">{selected.official_definition_he}</p>
-                  {selected.source_url && (
-                    <a href={selected.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
-                      מקור <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
                 </div>
 
+                {selected.type !== "legal" && (
                 <div className="bg-destructive/5 rounded-lg p-3" dir="rtl">
                   <h3 className="font-semibold text-sm text-destructive mb-2">דגל אדום</h3>
                   <ul className="space-y-1">
@@ -196,6 +196,7 @@ const Orders = () => {
                     ))}
                   </ul>
                 </div>
+                )}
 
                 <div className="bg-muted/50 rounded-lg p-3">
                   <h3 className="font-semibold text-sm text-primary mb-2">מה עושים?</h3>
@@ -208,45 +209,95 @@ const Orders = () => {
                   </ol>
                 </div>
 
-                <div className={`rounded-lg p-3 transition-all ${miniScenarioError && miniChoice === null ? "bg-destructive/10 ring-2 ring-destructive" : "bg-accent/10"}`}>
-                  <h3 className="font-semibold text-sm text-primary mb-2">תרחיש</h3>
-                  <p className="text-sm mb-3">{selected.mini_scenario_he}</p>
-                  {miniScenarioError && miniChoice === null && (
-                    <p className="text-xs text-destructive mb-2 font-medium">יש לענות על התרחיש לפני סגירה</p>
-                  )}
+                <Button onClick={() => setDialogPage(selected.type === "manifestly_illegal" ? "story" : "exercise")} className="w-full gap-2">
+                  <span>{selected.type === "manifestly_illegal" ? "לתוכן הבא" : "לתרגיל"}</span>
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          )}
 
-                  {/* Answer buttons */}
-                  <div className="space-y-2">
-                    {(selected.mini_choices_json as string[] || []).map((choice, i) => {
-                      const correctIdx = selected.mini_correct_index;
-                      const isSelected = miniChoice === i;
-                      const isCorrectChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i === correctIdx;
-                      const isWrongChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i !== correctIdx;
-                      // Disable buttons only after correct answer (not after wrong - allow retry)
-                      const isDisabled = miniChoice !== null && !isSelected;
-                      return (
-                        <Button
-                          key={i}
-                          variant={isSelected ? "default" : "outline"}
-                          disabled={isDisabled}
-                          className={`w-full text-right justify-start h-auto py-2 px-3 gap-2 ${
-                            isCorrectChoice
-                              ? "bg-success text-success-foreground hover:bg-success/90 border-success"
-                              : isWrongChoice
-                              ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive"
-                              : "hover:!bg-primary hover:!text-primary-foreground hover:!border-primary"
-                          }`}
-                          onClick={() => handleChoiceClick(i)}
-                        >
-                          <span className="flex-1 text-right">{choice}</span>
-                          {isCorrectChoice && <CheckCircle className="h-4 w-4 shrink-0" />}
-                          {isWrongChoice && <XCircle className="h-4 w-4 shrink-0" />}
-                        </Button>
-                      );
-                    })}
-                  </div>
+          {selected && dialogPage === "story" && selected.type === "manifestly_illegal" && (
+            <>
+              <DialogHeader className="text-right">
+                <DialogTitle className="text-xl text-right">כפר קאסם</DialogTitle>
+                <DialogDescription className="sr-only">סיפור כפר קאסם</DialogDescription>
+              </DialogHeader>
 
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed">כפר קאסם הוא אירוע שהפך לסמל בשאלה מתי אסור לציית לפקודה, גם תחת לחץ סמכות. בעקבות האירוע התחדד העיקרון שלפעמים פקודה יכולה להיות כל כך פסולה וברורה עד שחובה לעצור ולסרב לבצע.</p>
+
+                <div className="rounded-lg overflow-hidden">
+                  <iframe
+                    className="w-full aspect-video rounded-lg"
+                    src="https://www.youtube.com/embed/FTg6z3Wc7N4"
+                    title="סיפור כפר קאסם"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
+
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setDialogPage("info")} className="gap-2">
+                    <ArrowRight className="h-4 w-4" />
+                    <span>חזרה</span>
+                  </Button>
+                  <Button onClick={() => setDialogPage("exercise")} className="flex-1 gap-2">
+                    <span>לתרגיל</span>
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {selected && dialogPage === "exercise" && (
+            <>
+              <DialogHeader className="text-right">
+                <DialogTitle className="text-xl text-right">תרגיל - {selected.title_he}</DialogTitle>
+                <DialogDescription className="sr-only">תרגיל על הפקודה</DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <p className="text-sm">{selected.mini_scenario_he}</p>
+
+                {exerciseBlocked && miniChoice === null && (
+                  <p className="text-xs text-destructive font-medium">יש לענות על התרגיל לפני סגירה</p>
+                )}
+
+                <div className="space-y-2">
+                  {(selected.mini_choices_json as string[] || []).map((choice, i) => {
+                    const correctIdx = selected.mini_correct_index;
+                    const isSelected = miniChoice === i;
+                    const isCorrectChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i === correctIdx;
+                    const isWrongChoice = isSelected && correctIdx !== null && correctIdx !== undefined && i !== correctIdx;
+                    const isDisabled = miniChoice !== null && !isSelected;
+                    return (
+                      <Button
+                        key={i}
+                        variant={isSelected ? "default" : "outline"}
+                        disabled={isDisabled}
+                        className={`w-full text-right justify-start h-auto py-2.5 px-3 gap-2 whitespace-normal break-words ${
+                          isCorrectChoice
+                            ? "bg-success text-success-foreground hover:bg-success/90 border-success"
+                            : isWrongChoice
+                            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 border-destructive"
+                            : "hover:!bg-primary hover:!text-primary-foreground hover:!border-primary"
+                        }`}
+                        onClick={() => handleChoiceClick(i)}
+                      >
+                        <span className="flex-1 text-right text-xs sm:text-sm leading-snug">{choice}</span>
+                        {isCorrectChoice && <CheckCircle className="h-4 w-4 shrink-0" />}
+                        {isWrongChoice && <XCircle className="h-4 w-4 shrink-0" />}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                <Button variant="ghost" size="sm" onClick={() => setDialogPage(selected.type === "manifestly_illegal" ? "story" : "info")} className="gap-2">
+                  <ArrowRight className="h-4 w-4" />
+                  <span>חזרה</span>
+                </Button>
               </div>
             </>
           )}
@@ -256,10 +307,7 @@ const Orders = () => {
       {/* Feedback Modal */}
       <Dialog open={!!feedbackModal} onOpenChange={(open) => {
         if (!open) {
-          if (!feedbackIsCorrect) {
-            // Wrong answer - don't allow closing via X/ESC, must use "נסה שנית"
-            return;
-          }
+          if (!feedbackIsCorrect) return;
           setFeedbackModal(null);
         }
       }}>
@@ -272,7 +320,7 @@ const Orders = () => {
               </DialogHeader>
               <p className="text-sm leading-relaxed">{feedbackModal.text}</p>
               {!feedbackIsCorrect && (
-                <p className="text-xs text-muted-foreground">לא נורא—נסה שוב.</p>
+                <p className="text-xs text-muted-foreground">לא נורא - נסה שוב.</p>
               )}
               <Button onClick={() => {
                 if (feedbackIsCorrect) {

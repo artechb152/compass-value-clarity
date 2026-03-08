@@ -98,7 +98,7 @@ const Weekly = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-primary">דילמת השבוע</h1>
-            <p className="text-muted-foreground text-sm">הצבעה אנונימית ‑ פעם אחת לסקר</p>
+            <p className="text-muted-foreground text-sm">הצבעה אנונימית - פעם אחת לסקר</p>
           </div>
         </div>
 

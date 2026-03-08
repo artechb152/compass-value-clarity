@@ -41,7 +41,7 @@ const Journal = () => {
           <h1 className="text-2xl font-bold text-primary">📓 יומן אישי</h1>
           <Button size="sm" onClick={() => setShowForm(!showForm)}><Plus className="h-4 w-4 ml-1" /> חדש</Button>
         </div>
-        <p className="text-xs text-muted-foreground mb-4">🔒 רק את/ה רואה את הרשומות האלו</p>
+        <p className="text-xs text-muted-foreground mb-4">🔒 רק אתה רואה את הרשומות האלו</p>
 
         {showForm && (
           <Card className="mb-4">
@@ -49,7 +49,7 @@ const Journal = () => {
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="כותרת" />
               <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="מה עובר לך בראש?" rows={4} />
               <div className="flex gap-2">
-                <Button onClick={handleSave} disabled={saving}>{saving ? "שומר..." : "שמור/י"}</Button>
+                <Button onClick={handleSave} disabled={saving}>{saving ? "שומר..." : "שמור"}</Button>
                 <Button variant="outline" onClick={() => setShowForm(false)}>ביטול</Button>
               </div>
             </CardContent>
@@ -57,7 +57,7 @@ const Journal = () => {
         )}
 
         <div className="space-y-3">
-          {entries.length === 0 && <p className="text-center text-muted-foreground py-8">אין עדיין רשומות. התחל/י לכתוב!</p>}
+          {entries.length === 0 && <p className="text-center text-muted-foreground py-8">אין עדיין רשומות. התחל לכתוב!</p>}
           {entries.map((e) => (
             <Card key={e.id}>
               <CardHeader className="pb-1">

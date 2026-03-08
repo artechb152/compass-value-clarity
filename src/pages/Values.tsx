@@ -7,8 +7,30 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import SegmentedProgress from "@/components/SegmentedProgress";
-import { ExternalLink, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
+import { ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
+
+// YouTube video mapping from the "רוח צה״ל ממקורות ישראל" playlist
+const VALUE_VIDEO_MAP: Record<string, string> = {
+  "דבקות במשימה": "551W4ft9lRY",
+  "חתירה לניצחון": "551W4ft9lRY",
+  "דוגמה אישית": "FBvPclesjHE",
+  "חיי אדם": "dQPIT4GjRKM",
+  "טוהר הנשק": "kicVK4L-24I",
+  "מקצועיות": "f1AZseZjS4c",
+  "משמעת": "8xV7YvCDHVI",
+  "רעות": "ZwVd_rnsNZ0",
+  "שליחות": "hTD-Opt5FOQ",
+  "אחריות": "ZviBbiKt_dU",
+  "אמינות": "6PW8HzfIT9s",
+};
+
+function getVideoId(titleHe: string): string | null {
+  for (const [keyword, videoId] of Object.entries(VALUE_VIDEO_MAP)) {
+    if (titleHe.includes(keyword)) return videoId;
+  }
+  return null;
+}
 
 const Values = () => {
   const { user } = useAuth();
@@ -21,7 +43,16 @@ const Values = () => {
   const [showScrollHint, setShowScrollHint] = useState(true);
 
   useEffect(() => {
-    supabase.from("values").select("*").then(({ data }) => data && setValues(data));
+    supabase.from("values").select("*").then(({ data }) => {
+      if (data) {
+        const sorted = [...data].sort((a, b) => {
+          const aIsLast = a.title_he?.includes("ממלכתיות") ? 1 : 0;
+          const bIsLast = b.title_he?.includes("ממלכתיות") ? 1 : 0;
+          return aIsLast - bIsLast;
+        });
+        setValues(sorted);
+      }
+    });
     if (user) {
       const stored = JSON.parse(localStorage.getItem(`viewed_values_${user.id}`) || "[]");
       setViewedIds(stored);
@@ -89,7 +120,7 @@ const Values = () => {
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-primary">רוח צה״ל ‑ הערכים</h1>
+            <h1 className="text-2xl font-bold text-primary">רוח צה״ל - הערכים</h1>
             <p className="text-muted-foreground text-sm">11 ערכי יסוד. לחץ על ערך כדי ללמוד ולתרגל.</p>
           </div>
         </div>
@@ -143,17 +174,26 @@ const Values = () => {
               <div>
                 <h3 className="font-semibold text-sm text-primary mb-1">ההגדרה הרשמית</h3>
                 <p className="text-sm leading-relaxed">{selected.official_definition_he}</p>
-                {selected.source_url && (
-                  <a href={selected.source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
-                    מקור <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
               </div>
 
               {(selected as any).what_it_means_in_practice_he && (
                 <div className="bg-muted/50 rounded-lg p-3">
                   <h3 className="font-semibold text-sm text-primary mb-1">מה זה אומר בפועל?</h3>
                   <p className="text-sm">{(selected as any).what_it_means_in_practice_he}</p>
+                </div>
+              )}
+
+              {getVideoId(selected.title_he) && (
+                <div className="rounded-xl overflow-hidden shadow">
+                  <div className="relative aspect-video">
+                    <iframe
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${getVideoId(selected.title_he)}`}
+                      title={`${selected.title_he} - רוח צה״ל ממקורות ישראל`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
                 </div>
               )}
 

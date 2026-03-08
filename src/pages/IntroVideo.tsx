@@ -22,7 +22,11 @@ const IntroVideo = () => {
     supabase.from("user_meta").select("intro_video_completed").eq("user_id", user.id).maybeSingle().then(({ data }) => {
       if (data?.intro_video_completed) {
         setIsReturningUser(true);
-        setShowResumeDialog(true);
+        const resumeShownKey = `resume_dialog_shown_${user.id}`;
+        if (!sessionStorage.getItem(resumeShownKey)) {
+          setShowResumeDialog(true);
+          sessionStorage.setItem(resumeShownKey, "1");
+        }
       }
       setChecking(false);
     });
@@ -71,22 +75,7 @@ const IntroVideo = () => {
       </Button>
       <div className="w-full max-w-2xl mt-8">
         <h1 className="text-3xl font-bold text-primary text-center mb-1">רגע רוח צה״ל</h1>
-        <p className="text-center text-muted-foreground mb-6">לפני שמתחילים ‑ 3 דקות על מה שמוביל אותנו</p>
-
-        <div className="bg-card rounded-xl overflow-hidden shadow-lg mb-4">
-          <div className="relative aspect-video">
-            <iframe
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/OfpjyRBhAYc"
-              title="סרטון רוח צה״ל"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-          <p className="text-[10px] text-muted-foreground/50 text-center py-1.5 px-3">
-            הסרטון מתוך ערוץ היוטיוב של צה״ל. כל הזכויות שמורות ליוצרים.
-          </p>
-        </div>
+        <p className="text-center text-muted-foreground mb-6">לפני שמתחילים - על מה שמוביל אותנו</p>
 
         <div className="bg-card rounded-xl shadow px-4 py-5 mb-6 space-y-4">
           <h2 className="text-xl font-bold text-primary text-center">אז מה זה בעצם רוח צה״ל?</h2>
@@ -94,14 +83,17 @@ const IntroVideo = () => {
             רוח צה״ל היא תעודת הזהות הערכית של צה״ל, אשר ראוי שתעמוד ביסוד הפעולות של כל חייל וחיילת במסגרת צה״ל, בשירות סדיר ובשירות מילואים. רוח צה״ל וכללי הפעולה הנגזרים ממנו הם הקוד האתי של צה״ל.
           </p>
           <p className="text-sm leading-relaxed text-foreground/80">
-            רוח צה״ל היא המצפן הערכי שמכוון איך פועלים בצבא ‑ לא רק מה עושים, אלא גם איך עושים. היא עוזרת לקבל החלטות בשגרה וגם ברגעי לחץ, אי־ודאות או דילמות, ומזכירה לנו לשלב בין ביצוע משימה לבין אחריות, מקצועיות וכבוד האדם. לכן לאורך הקורס נתרגל מצבים שבהם ערכים מתנגשים, נבחן אפשרויות פעולה שונות, ונלמד לשאול את השאלות הנכונות לפני שמחליטים.
+            רוח צה״ל היא המצפן הערכי שמכוון איך פועלים בצבא - לא רק מה עושים, אלא גם איך עושים. היא עוזרת לקבל החלטות בשגרה וגם ברגעי לחץ, אי-ודאות או דילמות, ומזכירה לשלב בין ביצוע משימה לבין אחריות, מקצועיות וכבוד האדם.
           </p>
           <p className="text-sm leading-relaxed text-foreground/80">
-            רוח צה״ל נשענת על ארבעה מקורות מרכזיים: מסורת צה״ל ומורשת הלחימה שלו; מסורת מדינת ישראל (הדמוקרטיה, החוקים והמוסדות שלה); מסורת העם היהודי; וערכי מוסר אוניברסליים המבוססים על ערך האדם וכבודו.
+            רוח צה״ל נשענת על ארבעה מקורות מרכזיים: מסורת צה״ל ומורשת הלחימה שלו; מסורת מדינת ישראל - הדמוקרטיה, החוקים והמוסדות שלה; מסורת העם היהודי; וערכי מוסר אוניברסליים המבוססים על ערך האדם וכבודו.
+          </p>
+          <p className="text-sm leading-relaxed font-bold text-foreground">
+            בקורס הזה תתרגל מצבים שבהם ערכים מתנגשים, תבחן אפשרויות פעולה שונות, ותלמד לשאול את השאלות הנכונות לפני שאתה מחליט.
           </p>
           <img
             src={ruachImage}
-            alt="מסמך רוח צה״ל המקורי ‑ ערכי היסוד"
+            alt="מסמך רוח צה״ל המקורי - ערכי היסוד"
             className="w-full rounded-lg shadow-md"
           />
         </div>

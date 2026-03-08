@@ -44,7 +44,7 @@ const SubmitDilemma = () => {
             <CardContent className="py-8 text-center">
               <p className="text-lg font-medium text-primary">✓ הדילמה נשלחה!</p>
               <p className="text-sm text-muted-foreground mt-2">היא תופיע לאחר אישור.</p>
-              <Button className="mt-4" onClick={() => { setDone(false); setTitle(""); setStory(""); }}>שלח/י עוד</Button>
+              <Button className="mt-4" onClick={() => { setDone(false); setTitle(""); setStory(""); }}>שלח עוד</Button>
             </CardContent>
           </Card>
         ) : (
@@ -53,13 +53,13 @@ const SubmitDilemma = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">כותרת</label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="תנ/י שם קצר לדילמה" required />
+                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="תן שם קצר לדילמה" required />
                 </div>
                 <div>
                   <label className="text-sm font-medium">הסיפור</label>
-                  <Textarea value={story} onChange={(e) => setStory(e.target.value)} placeholder="ספר/י את הדילמה..." rows={5} required />
+                  <Textarea value={story} onChange={(e) => setStory(e.target.value)} placeholder="ספר את הדילמה..." rows={5} required />
                 </div>
-                <Button type="submit" className="w-full" disabled={saving}>{saving ? "שולח/ת..." : "שלח/י"}</Button>
+                <Button type="submit" className="w-full" disabled={saving}>{saving ? "שולח..." : "שלח"}</Button>
               </form>
             </CardContent>
           </Card>

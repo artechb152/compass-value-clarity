@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight, Trophy } from "lucide-react";
 
 const modules = [
-  { key: "values", title: "רוח צה״ל ‑ הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
+  { key: "values", title: "רוח צה״ל - הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
   { key: "orders", title: "פקודות", icon: Shield, to: "/orders", description: "חוקית / בלתי חוקית / בלתי חוקית בעליל", total: 3 },
   { key: "scenarios", title: "מעבדת דילמות", icon: FlaskConical, to: "/scenarios", description: "תרחישים אינטראקטיביים עם התנגשויות ערכיות", total: 8 },
 ];
@@ -139,7 +139,7 @@ const Home = () => {
             <DialogHeader>
               <DialogTitle className="text-2xl text-right">סיימת בהצלחה!</DialogTitle>
               <DialogDescription className="text-base mt-2 text-right">
-                עברת את כל התכנים ‑ ערכים, פקודות, דילמות ודילמת השבוע. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי בשטח.
+                עברת את כל התכנים - ערכים, פקודות, דילמות ודילמת השבוע. עכשיו יש לך כלים טובים יותר לשיקול דעת ערכי בשטח.
               </DialogDescription>
             </DialogHeader>
             <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
