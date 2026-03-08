@@ -79,7 +79,7 @@ const IntroVideo = () => {
         <p className="text-center text-muted-foreground mb-6">לפני שמתחילים - על מה שמוביל אותנו</p>
 
         <div className="bg-card rounded-xl shadow px-4 py-5 mb-6 space-y-4">
-          <h2 className="text-xl font-bold text-primary text-center">אז מה זה בעצם רוח צה״ל?</h2>
+          <h2 className="text-xl font-bold text-primary text-center">מהי רוח צה״ל?</h2>
           <p className="text-sm leading-relaxed text-foreground/80">
             רוח צה״ל היא תעודת הזהות הערכית של צה״ל, אשר ראוי שתעמוד ביסוד הפעולות של כל חייל וחיילת במסגרת צה״ל, בשירות סדיר ובשירות מילואים. רוח צה״ל וכללי הפעולה הנגזרים ממנו הם הקוד האתי של צה״ל.
           </p>
