@@ -249,7 +249,7 @@ const Scenarios = () => {
 
                 {selectedValues.length === 2 && (
                   <div className="space-y-4">
-                    <p className="text-sm font-medium text-foreground">כמה לדעתך הערכים שבחרת פגעו בסיטואציה?</p>
+                    <p className="text-sm font-medium text-foreground">כמה לדעתך הערכים שבחרת נפגעו בסיטואציה?</p>
                     {selectedValues.map((val) => (
                       <div key={val} className="bg-muted/30 rounded-lg p-3">
                         <p className="text-xs font-semibold text-primary text-right mb-2">{val}</p>
