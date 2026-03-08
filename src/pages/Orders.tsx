@@ -115,8 +115,16 @@ const Orders = () => {
     setMiniChoice(null);
   };
 
+  const [exerciseButtonFlash, setExerciseButtonFlash] = useState(false);
+
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
+      // If on info page and haven't gone to exercise yet, flash the exercise button
+      if (dialogPage === "info" && selected) {
+        setExerciseButtonFlash(true);
+        setTimeout(() => setExerciseButtonFlash(false), 1500);
+        return;
+      }
       // On exercise page, block closing if not answered
       if (dialogPage === "exercise" && miniChoice === null) {
         setExerciseBlocked(true);
@@ -124,6 +132,7 @@ const Orders = () => {
       }
       setSelected(null);
       setExerciseBlocked(false);
+      setExerciseButtonFlash(false);
     }
   };
 
@@ -176,7 +185,7 @@ const Orders = () => {
 
       {/* Order Dialog - 2 pages: info + exercise */}
       <Dialog open={!!selected} onOpenChange={handleCloseOrder}>
-        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide transition-all ${exerciseBlocked ? "ring-2 ring-destructive" : ""}`} dir="rtl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide transition-all" dir="rtl">
           {selected && dialogPage === "info" && (
             <>
               <DialogHeader className="text-right">
@@ -215,7 +224,7 @@ const Orders = () => {
                   </ol>
                 </div>
 
-                <Button onClick={() => setDialogPage(selected.type === "manifestly_illegal" ? "story" : "exercise")} className="w-full gap-2">
+                <Button onClick={() => { setDialogPage(selected.type === "manifestly_illegal" ? "story" : "exercise"); setExerciseButtonFlash(false); }} className={`w-full gap-2 transition-all ${exerciseButtonFlash ? "ring-2 ring-destructive animate-pulse" : ""}`}>
                   <span>{selected.type === "manifestly_illegal" ? "לתוכן הבא" : "לתרגיל"}</span>
                   <ArrowLeft className="h-4 w-4" />
                 </Button>

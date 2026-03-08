@@ -88,7 +88,7 @@ const Home = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto space-y-6">
         <div className="text-center py-6 relative">
-          <h1 className="text-3xl font-bold text-primary mb-1">רוח צה״ל</h1>
+          <h1 className="text-4xl font-bold text-primary mb-1">רוח צה״ל</h1>
           <p className="text-muted-foreground">התנגשות בין ערכים</p>
           <Button variant="ghost" size="icon" onClick={() => navigate("/intro")} className="absolute top-[26px] right-0 hover:bg-primary [&:hover_svg]:text-white" aria-label="חזרה למסך הפתיחה">
             <ArrowRight className="h-5 w-5 text-muted-foreground" />
