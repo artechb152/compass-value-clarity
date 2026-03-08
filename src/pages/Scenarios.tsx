@@ -111,7 +111,11 @@ const Scenarios = () => {
         setScaleValues(sv => { const next = { ...sv }; delete next[v]; return next; });
         return prev.filter((x) => x !== v);
       }
-      return prev.length < 2 ? [...prev, v] : prev;
+      if (prev.length < 2) {
+        setScaleValues(sv => ({ ...sv, [v]: 5 }));
+        return [...prev, v];
+      }
+      return prev;
     });
   };
 
