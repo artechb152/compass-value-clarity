@@ -119,17 +119,18 @@ const Orders = () => {
 
   const handleCloseOrder = (open: boolean) => {
     if (!open) {
-      // If on info page and haven't gone to exercise yet, flash the exercise button
-      if (dialogPage === "info" && selected) {
-        setExerciseButtonFlash(true);
-        setTimeout(() => setExerciseButtonFlash(false), 1500);
-        return;
-      }
       // On exercise page, block closing if not answered
       if (dialogPage === "exercise" && miniChoice === null) {
         setExerciseBlocked(true);
         return;
       }
+      // On info page (first page), flash the button to guide user to exercise
+      if (dialogPage === "info" && selected) {
+        setExerciseButtonFlash(true);
+        setTimeout(() => setExerciseButtonFlash(false), 1500);
+        return;
+      }
+      // On story page (page 2 of manifestly_illegal) - allow closing
       setSelected(null);
       setExerciseBlocked(false);
       setExerciseButtonFlash(false);
