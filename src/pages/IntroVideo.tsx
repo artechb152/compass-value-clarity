@@ -59,6 +59,7 @@ const IntroVideo = () => {
     if (!user) return;
     localStorage.removeItem(`viewed_values_${user.id}`);
     localStorage.removeItem(`viewed_orders_${user.id}`);
+    localStorage.removeItem(`correct_orders_${user.id}`);
     await supabase.from("progress").delete().eq("user_id", user.id);
     await supabase.from("responses").delete().eq("user_id", user.id);
     await supabase.from("journal_entries").delete().eq("user_id", user.id);
