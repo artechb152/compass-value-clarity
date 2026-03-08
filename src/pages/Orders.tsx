@@ -124,13 +124,12 @@ const Orders = () => {
         setExerciseBlocked(true);
         return;
       }
-      // On info page (first page), flash the button to guide user to exercise
-      if (dialogPage === "info" && selected) {
+      // On info or story page, flash the "next" button and block closing
+      if ((dialogPage === "info" || dialogPage === "story") && selected) {
         setExerciseButtonFlash(true);
         setTimeout(() => setExerciseButtonFlash(false), 1500);
         return;
       }
-      // On story page (page 2 of manifestly_illegal) - allow closing
       setSelected(null);
       setExerciseBlocked(false);
       setExerciseButtonFlash(false);
