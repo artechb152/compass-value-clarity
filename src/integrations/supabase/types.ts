@@ -107,6 +107,7 @@ export type Database = {
       responses: {
         Row: {
           choice: number | null
+          choice2: number | null
           created_at: string | null
           id: string
           reflection_text: string | null
@@ -119,6 +120,7 @@ export type Database = {
         }
         Insert: {
           choice?: number | null
+          choice2?: number | null
           created_at?: string | null
           id?: string
           reflection_text?: string | null
@@ -131,6 +133,7 @@ export type Database = {
         }
         Update: {
           choice?: number | null
+          choice2?: number | null
           created_at?: string | null
           id?: string
           reflection_text?: string | null
@@ -155,9 +158,11 @@ export type Database = {
         Row: {
           choice_rationale_json: Json | null
           choices_json: Json | null
+          choices2_json: Json | null
           closing_feedback_json: Json | null
           context_he: string | null
           dilemma_question_he: string | null
+          escalation_he: string | null
           feedback_json: Json | null
           id: string
           reflection_question_he: string | null
@@ -169,9 +174,11 @@ export type Database = {
         Insert: {
           choice_rationale_json?: Json | null
           choices_json?: Json | null
+          choices2_json?: Json | null
           closing_feedback_json?: Json | null
           context_he?: string | null
           dilemma_question_he?: string | null
+          escalation_he?: string | null
           feedback_json?: Json | null
           id: string
           reflection_question_he?: string | null
@@ -183,9 +190,11 @@ export type Database = {
         Update: {
           choice_rationale_json?: Json | null
           choices_json?: Json | null
+          choices2_json?: Json | null
           closing_feedback_json?: Json | null
           context_he?: string | null
           dilemma_question_he?: string | null
+          escalation_he?: string | null
           feedback_json?: Json | null
           id?: string
           reflection_question_he?: string | null
