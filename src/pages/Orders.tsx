@@ -32,7 +32,13 @@ const Orders = () => {
   const [exerciseBlocked, setExerciseBlocked] = useState(false);
 
   useEffect(() => {
-    supabase.from("orders").select("*").then(({ data }) => data && setOrders(data));
+    supabase.from("orders").select("*").then(({ data }) => {
+      if (data) {
+        const typeOrder = { legal: 0, illegal: 1, manifestly_illegal: 2 };
+        data.sort((a, b) => (typeOrder[a.type as keyof typeof typeOrder] ?? 9) - (typeOrder[b.type as keyof typeof typeOrder] ?? 9));
+        setOrders(data);
+      }
+    });
     if (user) {
       const storedCorrect = JSON.parse(localStorage.getItem(`correct_orders_${user.id}`) || "[]");
       setCorrectIds(storedCorrect);
