@@ -124,13 +124,12 @@ const Orders = () => {
         setExerciseBlocked(true);
         return;
       }
-      // On info page (first page), flash the button to guide user to exercise
-      if (dialogPage === "info" && selected) {
+      // On info or story page, flash the "next" button and block closing
+      if ((dialogPage === "info" || dialogPage === "story") && selected) {
         setExerciseButtonFlash(true);
         setTimeout(() => setExerciseButtonFlash(false), 1500);
         return;
       }
-      // On story page (page 2 of manifestly_illegal) - allow closing
       setSelected(null);
       setExerciseBlocked(false);
       setExerciseButtonFlash(false);
@@ -258,7 +257,7 @@ const Orders = () => {
                     <ArrowRight className="h-4 w-4" />
                     <span>חזרה</span>
                   </Button>
-                  <Button onClick={() => setDialogPage("exercise")} className="flex-1 gap-2">
+                  <Button onClick={() => setDialogPage("exercise")} className={`flex-1 gap-2 transition-all ${exerciseButtonFlash ? "ring-2 ring-destructive animate-pulse" : ""}`}>
                     <span>לתרגיל</span>
                     <ArrowLeft className="h-4 w-4" />
                   </Button>
