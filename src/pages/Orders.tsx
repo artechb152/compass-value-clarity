@@ -185,7 +185,7 @@ const Orders = () => {
 
       {/* Order Dialog - 2 pages: info + exercise */}
       <Dialog open={!!selected} onOpenChange={handleCloseOrder}>
-        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide transition-all ${exerciseBlocked ? "ring-2 ring-destructive" : ""}`} dir="rtl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide transition-all" dir="rtl">
           {selected && dialogPage === "info" && (
             <>
               <DialogHeader className="text-right">
