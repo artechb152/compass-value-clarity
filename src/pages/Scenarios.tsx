@@ -43,8 +43,6 @@ function seededShuffle<T>(arr: T[], seed: string): T[] {
 
 const SCENARIOS_PER_USER = 8;
 
-type DilemmaStep = "story" | "choice1" | "escalation" | "choice2" | "values" | "sliders" | "reflection";
-
 const Scenarios = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -55,8 +53,7 @@ const Scenarios = () => {
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
 
-  // Step state
-  const [step, setStep] = useState<DilemmaStep>("story");
+  // State
   const [choice1, setChoice1] = useState<number | null>(null);
   const [choice2, setChoice2] = useState<number | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
@@ -99,12 +96,12 @@ const Scenarios = () => {
   }, [scenarios, completedIds, initialIdxSet, allScenarios.length]);
 
   const scenario = currentIdx !== null ? scenarios[currentIdx] : null;
-  
+
   if (!scenario) return <AppShell><div className="p-4 text-center text-muted-foreground">טוען תרחישים...</div></AppShell>;
 
   const choices1 = (scenario.choices_json as string[]) || [];
-  const choices2 = (scenario.choices2_json as string[]) || [];
-  const escalationText = (scenario as any).escalation_he as string | null;
+  const choices2 = ((scenario as any).choices2_json as string[]) || [];
+  const escalationText = ((scenario as any).escalation_he as string) || "";
 
   const toggleValue = (v: string) => {
     setSelectedValues((prev) => {
@@ -120,7 +117,7 @@ const Scenarios = () => {
     });
   };
 
-  const canSubmit = selectedValues.length === 2 && selectedValues.every(v => scaleValues[v] !== undefined) && reflection.trim().length >= 1;
+  const canSubmit = choice1 !== null && choice2 !== null && selectedValues.length === 2 && selectedValues.every(v => scaleValues[v] !== undefined) && reflection.trim().length >= 1;
 
   const handleSubmit = async () => {
     if (!user) return;
@@ -159,7 +156,6 @@ const Scenarios = () => {
   };
 
   const resetState = () => {
-    setStep("story");
     setChoice1(null);
     setChoice2(null);
     setSelectedValues([]);
@@ -168,123 +164,6 @@ const Scenarios = () => {
   };
 
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
-
-  const renderStep = () => {
-    switch (step) {
-      case "story":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm whitespace-pre-line leading-relaxed">{scenario.story_he}</p>
-            <Button onClick={() => setStep("choice1")} className="w-full">
-              מה אתה עושה <ArrowLeft className="h-4 w-4 mr-2" />
-            </Button>
-          </div>
-        );
-      case "choice1":
-        return (
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-primary">מה אתה עושה</p>
-            {choices1.map((c, i) => (
-              <Button key={i} variant={choice1 === i ? "default" : "outline"} className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug whitespace-normal" onClick={() => setChoice1(i)}>
-                {c}
-              </Button>
-            ))}
-            {choice1 !== null && (
-              <Button onClick={() => setStep("escalation")} className="w-full mt-2">
-                המשך <ArrowLeft className="h-4 w-4 mr-2" />
-              </Button>
-            )}
-          </div>
-        );
-      case "escalation":
-        return (
-          <div className="space-y-4">
-            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
-              <p className="text-sm font-semibold text-destructive mb-1">המצב מחמיר</p>
-              <p className="text-sm">{escalationText}</p>
-            </div>
-            <Button onClick={() => setStep("choice2")} className="w-full">
-              מה אתה עושה עכשיו <ArrowLeft className="h-4 w-4 mr-2" />
-            </Button>
-          </div>
-        );
-      case "choice2":
-        return (
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-primary">מה אתה עושה עכשיו</p>
-            {choices2.map((c, i) => (
-              <Button key={i} variant={choice2 === i ? "default" : "outline"} className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug whitespace-normal" onClick={() => setChoice2(i)}>
-                {c}
-              </Button>
-            ))}
-            {choice2 !== null && (
-              <Button onClick={() => setStep("values")} className="w-full mt-2">
-                המשך <ArrowLeft className="h-4 w-4 mr-2" />
-              </Button>
-            )}
-          </div>
-        );
-      case "values":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-medium">בחר 2 ערכים שהתנגשו בדילמה</p>
-            <div className="flex flex-wrap gap-1.5">
-              {RUACH_VALUES.map((v) => (
-                <button
-                  key={v}
-                  className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15"}`}
-                  onClick={() => toggleValue(v)}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-            {selectedValues.length === 2 && (
-              <Button onClick={() => setStep("sliders")} className="w-full">
-                המשך <ArrowLeft className="h-4 w-4 mr-2" />
-              </Button>
-            )}
-          </div>
-        );
-      case "sliders":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-medium">עד כמה לדעתך הערך נפגע מההחלטה שלך</p>
-            {selectedValues.map((val) => (
-              <div key={val} className="bg-muted/30 rounded-lg p-3">
-                <p className="text-xs font-semibold text-primary text-right mb-3">{val}</p>
-                <Slider value={[scaleValues[val] ?? 5]} onValueChange={(v) => setScaleValues(prev => ({ ...prev, [val]: v[0] }))} min={1} max={10} step={1} />
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-1 px-0.5" dir="ltr">
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <span key={i + 1} className={scaleValues[val] === i + 1 ? "font-bold text-primary" : ""}>{i + 1}</span>
-                  ))}
-                </div>
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-0.5">
-                  <span>נפגע מאוד</span>
-                  <span>כמעט לא נפגע</span>
-                </div>
-              </div>
-            ))}
-            <Button onClick={() => setStep("reflection")} className="w-full">
-              המשך <ArrowLeft className="h-4 w-4 mr-2" />
-            </Button>
-          </div>
-        );
-      case "reflection":
-        return (
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm font-medium mb-2">ריפלקציה אישית</p>
-              <p className="text-xs text-muted-foreground mb-2">מה היה השיקול המרכזי שלך בהחלטה</p>
-              <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder="כתוב כאן..." rows={3} className="resize-none" />
-            </div>
-            <Button variant={canSubmit ? "default" : "outline"} onClick={handleSubmit} className="w-full" disabled={!canSubmit}>
-              סיכום והמשך <ArrowLeft className="h-4 w-4 mr-2" />
-            </Button>
-          </div>
-        );
-    }
-  };
 
   return (
     <AppShell>
@@ -311,12 +190,100 @@ const Scenarios = () => {
           <CardHeader className="p-3 sm:p-6">
             <CardTitle className="text-base sm:text-lg leading-snug">{scenario.title_he}</CardTitle>
           </CardHeader>
-          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-            {renderStep()}
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0 space-y-5">
+            {/* Story */}
+            <p className="text-sm whitespace-pre-line leading-relaxed">{scenario.story_he}</p>
+
+            {/* Choice 1 */}
+            <div className="space-y-2">
+              <p className="text-sm font-bold text-foreground">מה אתה עושה</p>
+              {choices1.map((c, i) => (
+                <Button key={i} variant={choice1 === i ? "default" : "outline"} className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug whitespace-normal hover:bg-primary hover:text-primary-foreground hover:border-primary" onClick={() => setChoice1(i)}>
+                  {c}
+                </Button>
+              ))}
+            </div>
+
+            {/* Escalation - show after choice1 */}
+            {choice1 !== null && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
+                <p className="text-sm font-bold text-foreground mb-1">המצב מחמיר</p>
+                <p className="text-sm">{escalationText}</p>
+              </div>
+            )}
+
+            {/* Choice 2 - show after choice1 */}
+            {choice1 !== null && (
+              <div className="space-y-2">
+                <p className="text-sm font-bold text-foreground">מה אתה עושה עכשיו</p>
+                {choices2.map((c, i) => (
+                  <Button key={i} variant={choice2 === i ? "default" : "outline"} className="w-full text-right justify-start h-auto py-2.5 px-3 text-xs sm:text-sm leading-snug whitespace-normal hover:bg-primary hover:text-primary-foreground hover:border-primary" onClick={() => setChoice2(i)}>
+                    {c}
+                  </Button>
+                ))}
+              </div>
+            )}
+
+            {/* Values - show after choice2 */}
+            {choice2 !== null && (
+              <div className="space-y-3">
+                <p className="text-sm font-bold text-foreground">בחר 2 ערכים שהתנגשו בדילמה</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {RUACH_VALUES.map((v) => (
+                    <button
+                      key={v}
+                      className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15"}`}
+                      onClick={() => toggleValue(v)}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sliders - show after 2 values selected */}
+            {selectedValues.length === 2 && (
+              <div className="space-y-4">
+                <p className="text-sm font-bold text-foreground">עד כמה לדעתך הערך נפגע מההחלטה שלך</p>
+                {selectedValues.map((val) => (
+                  <div key={val} className="bg-muted/30 rounded-lg p-3">
+                    <p className="text-xs font-semibold text-primary text-right mb-3">{val}</p>
+                    <Slider value={[scaleValues[val] ?? 5]} onValueChange={(v) => setScaleValues(prev => ({ ...prev, [val]: v[0] }))} min={1} max={10} step={1} />
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1 px-0.5" dir="ltr">
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <span key={i + 1} className={scaleValues[val] === i + 1 ? "font-bold text-primary" : ""}>{i + 1}</span>
+                      ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-0.5">
+                      <span>נפגע מאוד</span>
+                      <span>כמעט לא נפגע</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Reflection - show after sliders */}
+            {selectedValues.length === 2 && (
+              <div>
+                <p className="text-sm font-bold text-foreground mb-1">ריפלקציה אישית</p>
+                <p className="text-xs text-muted-foreground mb-2">מה היה השיקול המרכזי שלך בהחלטה</p>
+                <Textarea value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder="כתוב כאן..." rows={3} className="resize-none" />
+              </div>
+            )}
+
+            {/* Submit */}
+            {selectedValues.length === 2 && (
+              <Button variant={canSubmit ? "default" : "outline"} onClick={handleSubmit} className="w-full" disabled={!canSubmit}>
+                סיכום והמשך <ArrowLeft className="h-4 w-4 mr-2" />
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
 
+      {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
           <DialogHeader className="text-right">
@@ -338,6 +305,7 @@ const Scenarios = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide text-center" dir="rtl">
           <DialogHeader>
