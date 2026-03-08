@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Trophy } from "lucide-react";
+import { ArrowRight, ArrowLeft, ArrowDown, Trophy, Loader2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const RUACH_VALUES = [
@@ -59,6 +59,33 @@ const Scenarios = () => {
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [scaleValues, setScaleValues] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
+  const [conclusion, setConclusion] = useState("");
+  const [loadingConclusion, setLoadingConclusion] = useState(false);
+
+  // Scroll indicator
+  const [showScrollArrow, setShowScrollArrow] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const checkScroll = useCallback(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const scrollBottom = window.innerHeight + window.scrollY;
+    const docHeight = document.documentElement.scrollHeight;
+    setShowScrollArrow(docHeight - scrollBottom > 80);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+    const observer = new MutationObserver(checkScroll);
+    if (contentRef.current) observer.observe(contentRef.current, { childList: true, subtree: true });
+    return () => {
+      window.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+      observer.disconnect();
+    };
+  }, [checkScroll]);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
@@ -119,6 +146,28 @@ const Scenarios = () => {
 
   const canSubmit = choice1 !== null && choice2 !== null && selectedValues.length === 2 && selectedValues.every(v => scaleValues[v] !== undefined) && reflection.trim().length >= 1;
 
+  const generateConclusion = async () => {
+    if (!scenario || choice1 === null || choice2 === null) return;
+    setLoadingConclusion(true);
+    try {
+      const { data } = await supabase.functions.invoke("generate-conclusion", {
+        body: {
+          title: scenario.title_he,
+          story: scenario.story_he?.substring(0, 300),
+          choice1Text: choices1[choice1],
+          choice2Text: choices2[choice2],
+          values: selectedValues,
+          reflection,
+        },
+      });
+      setConclusion(data?.conclusion || "");
+    } catch {
+      setConclusion("");
+    } finally {
+      setLoadingConclusion(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!user) return;
     await supabase.from("responses").insert({
@@ -140,6 +189,7 @@ const Scenarios = () => {
     });
     setShowSummaryModal(true);
     toast.success("התשובה נשמרה!");
+    generateConclusion();
   };
 
   const goNext = () => {
@@ -161,13 +211,20 @@ const Scenarios = () => {
     setSelectedValues([]);
     setScaleValues({});
     setReflection("");
+    setConclusion("");
+    setLoadingConclusion(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
 
+  const scrollDown = () => {
+    window.scrollBy({ top: 300, behavior: "smooth" });
+  };
+
   return (
     <AppShell>
-      <div className="p-4 max-w-2xl mx-auto">
+      <div className="p-4 max-w-2xl mx-auto" ref={contentRef}>
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
@@ -204,7 +261,7 @@ const Scenarios = () => {
               ))}
             </div>
 
-            {/* Escalation - show after choice1 */}
+            {/* Escalation */}
             {choice1 !== null && (
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
                 <p className="text-sm font-bold text-foreground mb-1">המצב מחמיר</p>
@@ -212,7 +269,7 @@ const Scenarios = () => {
               </div>
             )}
 
-            {/* Choice 2 - show after choice1 */}
+            {/* Choice 2 */}
             {choice1 !== null && (
               <div className="space-y-2">
                 <p className="text-sm font-bold text-foreground">מה אתה עושה עכשיו</p>
@@ -224,7 +281,7 @@ const Scenarios = () => {
               </div>
             )}
 
-            {/* Values - show after choice2 */}
+            {/* Values */}
             {choice2 !== null && (
               <div className="space-y-3">
                 <p className="text-sm font-bold text-foreground">בחר 2 ערכים שהתנגשו בדילמה</p>
@@ -242,7 +299,7 @@ const Scenarios = () => {
               </div>
             )}
 
-            {/* Sliders - show after 2 values selected */}
+            {/* Sliders */}
             {selectedValues.length === 2 && (
               <div className="space-y-4">
                 <p className="text-sm font-bold text-foreground">עד כמה לדעתך הערך נפגע מההחלטה שלך</p>
@@ -264,7 +321,7 @@ const Scenarios = () => {
               </div>
             )}
 
-            {/* Reflection - show after sliders */}
+            {/* Reflection */}
             {selectedValues.length === 2 && (
               <div>
                 <p className="text-sm font-bold text-foreground mb-1">ריפלקציה אישית</p>
@@ -283,6 +340,17 @@ const Scenarios = () => {
         </Card>
       </div>
 
+      {/* Scroll down indicator */}
+      {showScrollArrow && (
+        <button
+          onClick={scrollDown}
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-primary-foreground rounded-full p-2 shadow-lg animate-bounce"
+          aria-label="גלול למטה"
+        >
+          <ArrowDown className="h-5 w-5" />
+        </button>
+      )}
+
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
@@ -298,6 +366,21 @@ const Scenarios = () => {
               <p key={v}>- <strong>{v}:</strong> {scaleValues[v] ?? 5}/10</p>
             ))}
             {reflection && <p>- <strong>השיקול שלך:</strong> ״{reflection}״</p>}
+
+            {/* AI Conclusion */}
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mt-3">
+              <p className="text-sm font-bold text-foreground mb-1">מסקנה</p>
+              {loadingConclusion ? (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-xs">מייצר תובנה אישית...</span>
+                </div>
+              ) : conclusion ? (
+                <p className="text-sm leading-relaxed">{conclusion}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">לא הצלחנו לייצר מסקנה. המשך לדילמה הבאה.</p>
+              )}
+            </div>
           </div>
           <Button onClick={goNext} className="w-full mt-2">
             {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לדילמה הבאה" : "סיום"} <ArrowLeft className="h-4 w-4 mr-2" />
