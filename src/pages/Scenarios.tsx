@@ -60,8 +60,19 @@ const Scenarios = () => {
   const [scaleValues, setScaleValues] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
-  
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 40);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
@@ -331,10 +342,12 @@ const Scenarios = () => {
           </CardContent>
         </Card>
 
-        {/* Subtle scroll indicator */}
-        <div className="flex justify-center pb-4 animate-bounce opacity-30">
-          <ChevronDown className="h-5 w-5 text-muted-foreground" />
-        </div>
+        {/* Scroll indicator - hidden when at bottom */}
+        {!isAtBottom && (
+          <div className="flex justify-center pb-4 opacity-60">
+            <ChevronDown className="h-5 w-5 text-primary" />
+          </div>
+        )}
       </div>
 
 
@@ -369,8 +382,8 @@ const Scenarios = () => {
             )}
           </div>
 
-          <div className="flex justify-center animate-bounce opacity-30 -mb-1">
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <div className="flex justify-center opacity-60 -mb-1">
+            <ChevronDown className="h-4 w-4 text-primary" />
           </div>
           <Button onClick={goNext} className="w-full mt-1">
             {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לדילמה הבאה" : "סיום"} <ArrowLeft className="h-4 w-4 mr-2" />
