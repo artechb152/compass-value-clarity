@@ -146,6 +146,8 @@ const Scenarios = () => {
 
   const canSubmit = choice1 !== null && choice2 !== null && selectedValues.length === 2 && selectedValues.every(v => scaleValues[v] !== undefined) && reflection.trim().length >= 1;
 
+  const didChangeDirection = choice1 !== null && choice2 !== null && choice1 !== choice2;
+
   const generateConclusion = async () => {
     if (!scenario || choice1 === null || choice2 === null) return;
     setLoadingConclusion(true);
@@ -157,7 +159,9 @@ const Scenarios = () => {
           choice1Text: choices1[choice1],
           choice2Text: choices2[choice2],
           values: selectedValues,
+          scaleValues,
           reflection,
+          changedDirection: didChangeDirection,
         },
       });
       setConclusion(data?.conclusion || "");
@@ -355,18 +359,38 @@ const Scenarios = () => {
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
           <DialogHeader className="text-right">
-            <DialogTitle className="text-lg text-right">המשוב שלך</DialogTitle>
+            <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 text-sm text-right">
-            <p>- <strong>החלטה ראשונה:</strong> {choice1 !== null ? choices1[choice1] : ""}</p>
-            <p>- <strong>החלטה שנייה:</strong> {choice2 !== null ? choices2[choice2] : ""}</p>
-            <p>- <strong>ערכים שהתנגשו:</strong> {selectedValues.join(" ו-")}</p>
+
+          {/* Part 1 - Choice Summary */}
+          <div className="space-y-2 text-sm text-right">
+            <p className="font-bold text-foreground mb-2">סיכום הבחירות שלך</p>
+            <p>• הבחירה הראשונה שלך הייתה: <strong>{choice1 !== null ? choices1[choice1] : ""}</strong></p>
+            <p>• אחרי ההחמרה בחרת: <strong>{choice2 !== null ? choices2[choice2] : ""}</strong></p>
+            <p>• {didChangeDirection ? "שינית כיוון אחרי ההחמרה" : "נשארת באותו כיוון גם אחרי ההחמרה"}</p>
+            <p>• סימנת שההתנגשות המרכזית הייתה בין <strong>{selectedValues[0]}</strong> לבין <strong>{selectedValues[1]}</strong></p>
             {selectedValues.map(v => (
-              <p key={v}>- <strong>{v}:</strong> {scaleValues[v] ?? 5}/10</p>
+              <p key={v}>• בסקלה סימנת ש<strong>{v}</strong> נפגע ברמה של <strong>{scaleValues[v] ?? 5}/10</strong></p>
             ))}
-            {reflection && <p>- <strong>השיקול שלך:</strong> ״{reflection}״</p>}
+            {reflection && <p>• ברפלקציה כתבת: ״{reflection}״</p>}
           </div>
+
+          {/* Part 2 - AI Personalized Feedback */}
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
+            <p className="font-bold text-foreground text-sm mb-2">משוב מותאם אישית</p>
+            {loadingConclusion ? (
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>מייצר משוב...</span>
+              </div>
+            ) : conclusion ? (
+              <p className="text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
+            )}
+          </div>
+
           <Button onClick={goNext} className="w-full mt-2">
             {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לדילמה הבאה" : "סיום"} <ArrowLeft className="h-4 w-4 mr-2" />
           </Button>
