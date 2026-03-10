@@ -131,26 +131,35 @@ const Scenarios = () => {
     const s1 = scaleValues[val1] ?? 5;
     const s2 = scaleValues[val2] ?? 5;
     const moreImpacted = s1 > s2 ? val1 : s2 > s1 ? val2 : null;
+    const bothHigh = s1 >= 7 && s2 >= 7;
+    const bothLow = s1 <= 3 && s2 <= 3;
 
+    // Line 1: Direction change analysis
     const directionLine = didChangeDirection
-      ? "אחרי שהדילמה החמירה, בחרת לשנות כיוון - מה שמעיד שהמחיר של ההחלטה הראשונה נעשה מבחינתך כבד יותר."
-      : "גם כשהמצב החמיר, נשארת באותו כיוון - מה שמעיד על עקביות בשיקול הדעת שלך.";
+      ? "אחרי שהמצב החמיר, בחרת לשנות כיוון. זה מראה שהמחיר של ההחלטה הראשונה הפך מבחינתך לגבוה מדי, ושהיית מוכן להתאים את עצמך למציאות חדשה."
+      : "גם כשהמצב החמיר, נשארת באותו כיוון. זה מעיד על עקביות בשיקול הדעת שלך, אבל גם אומר שהיית מוכן לשלם את המחיר שנלווה לבחירה הראשונה.";
 
-    const impactLine = moreImpacted
-      ? `סימנת שההתנגשות המרכזית הייתה בין ${val1} לבין ${val2}, ולפי הסקלה שלך הרגשת שהפגיעה המרכזית הייתה דווקא ב${moreImpacted}.`
-      : `סימנת שההתנגשות המרכזית הייתה בין ${val1} לבין ${val2}, ולפי הסקלה שלך שניהם נפגעו באופן דומה - מה שמעיד על דילמה עמוקה במיוחד.`;
+    // Line 2: Values impact analysis
+    let impactLine: string;
+    if (bothHigh) {
+      impactLine = `סימנת שגם ${val1} וגם ${val2} נפגעו ברמה גבוהה - מה שמראה שהרגשת שאין כאן מנצחים, ושכל בחירה דורשת ויתור משמעותי.`;
+    } else if (bothLow) {
+      impactLine = `סימנת שהפגיעה בשני הערכים הייתה נמוכה יחסית. ייתכן שמצאת דרך לאזן, או שהדילמה הרגישה לך פחות קיצונית.`;
+    } else if (moreImpacted) {
+      impactLine = `לפי הסקלה שלך, הרגשת שהפגיעה המרכזית הייתה דווקא ב${moreImpacted}. זה אומר שהבחירה שלך שמרה יותר על ${moreImpacted === val1 ? val2 : val1}, גם במחיר של ${moreImpacted}.`;
+    } else {
+      impactLine = `סימנת ש${val1} ו${val2} נפגעו באופן דומה - מה שמעיד על דילמה שבה אין בחירה שלא גובה מחיר.`;
+    }
 
-    const reflectionLine = reflection.trim().length > 0
-      ? `ברפלקציה שלך עלה שהשיקול המרכזי קשור ל${reflection.trim().length > 40 ? reflection.trim().substring(0, 40) + "..." : reflection.trim()}, וזה מחזק את ההבנה שפעלת מתוך מודעות לערכים שהתנגשו.`
+    // Line 3: Reflection tie-in
+    const reflectionLine = reflection.trim().length > 5
+      ? `ברפלקציה שלך עלה שהשיקול המרכזי היה קשור ל${reflection.trim().length > 50 ? reflection.trim().substring(0, 50) + "..." : reflection.trim()}. זה מחזק את ההבנה שפעלת מתוך מודעות למחיר של כל אפשרות.`
       : "";
 
-    const lines = [
-      `הבחירה שלך מראה שניסית לאזן בין ערכים שונים במצב שאין בו תשובה אחת נכונה.`,
-      directionLine,
-      impactLine,
-      reflectionLine,
-    ].filter(Boolean);
+    // Line 4: Closing insight
+    const closingLine = "בדילמה כזאת אין תשובה אחת נכונה - יש רק בחירות עם מחירים שונים. מה שחשוב הוא שאתה מבין מה בחרת לשמור ועל מה ויתרת.";
 
+    const lines = [directionLine, impactLine, reflectionLine, closingLine].filter(Boolean);
     setConclusion(lines.join("\n"));
   };
 
