@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import SegmentedProgress from "@/components/SegmentedProgress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Trophy, ChevronDown } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy, ChevronDown, X } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const RUACH_VALUES = [
@@ -60,19 +60,6 @@ const Scenarios = () => {
   const [scaleValues, setScaleValues] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
-  const [isAtBottom, setIsAtBottom] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-      setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 40);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
@@ -342,19 +329,20 @@ const Scenarios = () => {
           </CardContent>
         </Card>
 
-        {/* Scroll indicator - hidden when at bottom */}
-        {!isAtBottom && (
-          <div className="flex justify-center pb-4 opacity-60">
-            <ChevronDown className="h-5 w-5 text-primary" />
-          </div>
-        )}
+        {/* Scroll indicator */}
+        <div className="flex justify-center pb-4 opacity-60">
+          <ChevronDown className="h-5 w-5 text-primary" />
+        </div>
       </div>
 
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
         <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide p-4 sm:p-6" dir="rtl">
-          <DialogHeader className="text-right">
+          <DialogHeader className="text-right flex flex-row items-center justify-between">
+            <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
+              <X className="h-4 w-4" />
+            </DialogClose>
             <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
           </DialogHeader>
@@ -394,7 +382,10 @@ const Scenarios = () => {
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide text-center" dir="rtl">
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
+              <X className="h-4 w-4" />
+            </DialogClose>
             <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
             <DialogDescription className="text-base mt-2 text-right">
               סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
