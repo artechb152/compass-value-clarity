@@ -146,6 +146,8 @@ const Scenarios = () => {
 
   const canSubmit = choice1 !== null && choice2 !== null && selectedValues.length === 2 && selectedValues.every(v => scaleValues[v] !== undefined) && reflection.trim().length >= 1;
 
+  const didChangeDirection = choice1 !== null && choice2 !== null && choice1 !== choice2;
+
   const generateConclusion = async () => {
     if (!scenario || choice1 === null || choice2 === null) return;
     setLoadingConclusion(true);
@@ -157,7 +159,9 @@ const Scenarios = () => {
           choice1Text: choices1[choice1],
           choice2Text: choices2[choice2],
           values: selectedValues,
+          scaleValues,
           reflection,
+          changedDirection: didChangeDirection,
         },
       });
       setConclusion(data?.conclusion || "");

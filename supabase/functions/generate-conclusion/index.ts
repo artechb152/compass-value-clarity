@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-const LOVABLE_API_URL = "https://api.lovable.dev/v1/chat/completions";
+const LOVABLE_API_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -14,19 +14,44 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { title, story, choice1Text, choice2Text, values, reflection } = await req.json();
+    const { title, story, choice1Text, choice2Text, values, scaleValues, reflection, changedDirection } = await req.json();
 
-    const prompt = `אתה מלווה חינוכי בתחום ערכי רוח צה"ל. קיבלת את התשובות של חייל לדילמה ערכית.
+    const directionText = changedDirection ? "שינה כיוון" : "נשאר באותו כיוון";
+    const val1 = values[0];
+    const val2 = values[1];
+    const scale1 = scaleValues?.[val1] ?? 5;
+    const scale2 = scaleValues?.[val2] ?? 5;
+
+    const moreImpacted = scale1 < scale2 ? val1 : scale2 < scale1 ? val2 : null;
+
+    const prompt = `אתה מלווה חינוכי בתחום ערכי רוח צה"ל. כתוב משוב מותאם אישית (3-4 שורות בלבד) לחייל שעבר דילמה ערכית.
 
 דילמה: ${title}
-תרחיש: ${story}
+תרחיש (תקציר): ${story}
 
-החלטה ראשונה: ${choice1Text}
-לאחר החמרה, החלטה שנייה: ${choice2Text}
-ערכים שהתנגשו: ${values.join(" ו-")}
-השיקול המרכזי: ${reflection}
+בחירה ראשונה: ${choice1Text}
+בחירה שנייה (אחרי החמרה): ${choice2Text}
+המשתמש ${directionText} אחרי ההחמרה.
 
-כתוב מסקנה אישית קצרה (2-3 משפטים) בלשון זכר, שמשקפת לחייל מה אפשר ללמוד מהבחירות שלו. אל תשפוט, אל תגיד מה נכון ומה לא. פשוט שקף תובנה עמוקה ואנושית שיכולה לעזור לו להבין את עצמו טוב יותר. כתוב בעברית טבעית ואנושית.`;
+ערכים שהתנגשו: ${val1} ו-${val2}
+סקלת פגיעה (1=כמעט לא נפגע, 10=נפגע מאוד): ${val1}: ${scale1}/10, ${val2}: ${scale2}/10
+${moreImpacted ? `הערך שנפגע יותר לפי המשתמש: ${moreImpacted}` : "שני הערכים נפגעו באופן דומה"}
+
+רפלקציה אישית של המשתמש: "${reflection}"
+
+הנחיות כתיבה:
+- כתוב בלשון זכר, יחיד, פנייה ישירה
+- אל תשפוט, אל תכריע מי צודק
+- אל תגיד "טעית" או "צדקת"
+- כן תסביר מה הבחירה משקפת
+- כן תאיר מה היה המחיר של ההחלטה
+- כן תחבר בין ההחלטה לערכים שהתנגשו
+- כן תשקף למשתמש איך הוא הפעיל שיקול דעת
+- התייחס לשינוי/עקביות הכיוון אחרי ההחמרה
+- התייחס לסקלות - איזה ערך נפגע יותר
+- שלב התייחסות קצרה לרפלקציה
+- טון: רשמי אבל אנושי, לא כבד, לא מטיפני
+- אורך: בדיוק 3-4 שורות`;
 
     const response = await fetch(LOVABLE_API_URL, {
       method: "POST",
@@ -37,9 +62,28 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 300,
+        max_tokens: 400,
       }),
     });
+
+    if (!response.ok) {
+      const status = response.status;
+      if (status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+          status: 429,
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        });
+      }
+      if (status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required" }), {
+          status: 402,
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        });
+      }
+      const t = await response.text();
+      console.error("AI gateway error:", status, t);
+      throw new Error("AI gateway error");
+    }
 
     const data = await response.json();
     const conclusion = data.choices?.[0]?.message?.content || "";
