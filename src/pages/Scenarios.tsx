@@ -382,7 +382,10 @@ const Scenarios = () => {
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide text-center" dir="rtl">
-          <DialogHeader>
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
+              <X className="h-4 w-4" />
+            </DialogClose>
             <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
             <DialogDescription className="text-base mt-2 text-right">
               סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
