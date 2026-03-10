@@ -62,30 +62,6 @@ const Scenarios = () => {
   const [conclusion, setConclusion] = useState("");
   const [loadingConclusion, setLoadingConclusion] = useState(false);
 
-  // Scroll indicator
-  const [showScrollArrow, setShowScrollArrow] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const checkScroll = useCallback(() => {
-    requestAnimationFrame(() => {
-      const scrollBottom = window.innerHeight + window.scrollY;
-      const docHeight = document.documentElement.scrollHeight;
-      setShowScrollArrow(docHeight - scrollBottom > 80);
-    });
-  }, []);
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
-    const observer = new MutationObserver(checkScroll);
-    if (contentRef.current) observer.observe(contentRef.current, { childList: true, subtree: true });
-    return () => {
-      window.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-      observer.disconnect();
-    };
-  }, [checkScroll]);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
