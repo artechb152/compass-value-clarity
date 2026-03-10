@@ -195,6 +195,7 @@ const Scenarios = () => {
       return newCompleted;
     });
     setShowSummaryModal(true);
+    setIsModalAtBottom(false);
     toast.success("התשובה נשמרה!");
     generateConclusion();
   };
