@@ -359,15 +359,15 @@ const Scenarios = () => {
           const el = e.currentTarget;
           setIsModalAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 30);
         }}>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex justify-end w-full">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
             </DialogClose>
-            <DialogHeader className="text-right w-full">
-              <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
-              <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
-            </DialogHeader>
           </div>
+          <DialogHeader className="text-right w-full">
+            <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
+            <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
+          </DialogHeader>
 
           {/* Part 1 - Choice Summary */}
           <div className="space-y-1.5 text-xs sm:text-sm text-right">
