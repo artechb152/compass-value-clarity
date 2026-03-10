@@ -305,7 +305,7 @@ const Scenarios = () => {
                   {RUACH_VALUES.map((v) => (
                     <button
                       key={v}
-                      className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15"}`}
+                      className={`cursor-pointer px-2.5 py-1.5 text-[11px] sm:text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15"}`}
                       onClick={() => toggleValue(v)}
                     >
                       {v}
