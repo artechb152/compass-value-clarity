@@ -345,15 +345,10 @@ const Scenarios = () => {
             {reflection && <p>• ברפלקציה כתבת: ״{reflection}״</p>}
           </div>
 
-          {/* Part 2 - AI Personalized Feedback */}
+          {/* Part 2 - Personalized Feedback */}
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
             <p className="font-bold text-foreground text-sm mb-2">משוב מותאם אישית</p>
-            {loadingConclusion ? (
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>מייצר משוב...</span>
-              </div>
-            ) : conclusion ? (
+            {conclusion ? (
               <p className="text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
             ) : (
               <p className="text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
