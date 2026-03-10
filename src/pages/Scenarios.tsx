@@ -60,7 +60,7 @@ const Scenarios = () => {
   const [scaleValues, setScaleValues] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
-  const [loadingConclusion, setLoadingConclusion] = useState(false);
+  const [loadingConclusion] = useState(false);
 
 
   useEffect(() => {
