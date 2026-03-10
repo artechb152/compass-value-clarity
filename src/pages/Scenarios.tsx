@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Trophy, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const RUACH_VALUES = [
@@ -60,7 +60,7 @@ const Scenarios = () => {
   const [scaleValues, setScaleValues] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
-  const [loadingConclusion, setLoadingConclusion] = useState(false);
+  
 
 
   useEffect(() => {
@@ -124,28 +124,34 @@ const Scenarios = () => {
 
   const didChangeDirection = choice1 !== null && choice2 !== null && choice1 !== choice2;
 
-  const generateConclusion = async () => {
-    if (!scenario || choice1 === null || choice2 === null) return;
-    setLoadingConclusion(true);
-    try {
-      const { data } = await supabase.functions.invoke("generate-conclusion", {
-        body: {
-          title: scenario.title_he,
-          story: scenario.story_he?.substring(0, 300),
-          choice1Text: choices1[choice1],
-          choice2Text: choices2[choice2],
-          values: selectedValues,
-          scaleValues,
-          reflection,
-          changedDirection: didChangeDirection,
-        },
-      });
-      setConclusion(data?.conclusion || "");
-    } catch {
-      setConclusion("");
-    } finally {
-      setLoadingConclusion(false);
-    }
+  const generateConclusion = () => {
+    if (!scenario || choice1 === null || choice2 === null || selectedValues.length < 2) return;
+    const val1 = selectedValues[0];
+    const val2 = selectedValues[1];
+    const s1 = scaleValues[val1] ?? 5;
+    const s2 = scaleValues[val2] ?? 5;
+    const moreImpacted = s1 > s2 ? val1 : s2 > s1 ? val2 : null;
+
+    const directionLine = didChangeDirection
+      ? "אחרי שהדילמה החמירה, בחרת לשנות כיוון - מה שמעיד שהמחיר של ההחלטה הראשונה נעשה מבחינתך כבד יותר."
+      : "גם כשהמצב החמיר, נשארת באותו כיוון - מה שמעיד על עקביות בשיקול הדעת שלך.";
+
+    const impactLine = moreImpacted
+      ? `סימנת שההתנגשות המרכזית הייתה בין ${val1} לבין ${val2}, ולפי הסקלה שלך הרגשת שהפגיעה המרכזית הייתה דווקא ב${moreImpacted}.`
+      : `סימנת שההתנגשות המרכזית הייתה בין ${val1} לבין ${val2}, ולפי הסקלה שלך שניהם נפגעו באופן דומה - מה שמעיד על דילמה עמוקה במיוחד.`;
+
+    const reflectionLine = reflection.trim().length > 0
+      ? `ברפלקציה שלך עלה שהשיקול המרכזי קשור ל${reflection.trim().length > 40 ? reflection.trim().substring(0, 40) + "..." : reflection.trim()}, וזה מחזק את ההבנה שפעלת מתוך מודעות לערכים שהתנגשו.`
+      : "";
+
+    const lines = [
+      `הבחירה שלך מראה שניסית לאזן בין ערכים שונים במצב שאין בו תשובה אחת נכונה.`,
+      directionLine,
+      impactLine,
+      reflectionLine,
+    ].filter(Boolean);
+
+    setConclusion(lines.join("\n"));
   };
 
   const handleSubmit = async () => {
@@ -192,7 +198,7 @@ const Scenarios = () => {
     setScaleValues({});
     setReflection("");
     setConclusion("");
-    setLoadingConclusion(false);
+    
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -339,15 +345,10 @@ const Scenarios = () => {
             {reflection && <p>• ברפלקציה כתבת: ״{reflection}״</p>}
           </div>
 
-          {/* Part 2 - AI Personalized Feedback */}
+          {/* Part 2 - Personalized Feedback */}
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
             <p className="font-bold text-foreground text-sm mb-2">משוב מותאם אישית</p>
-            {loadingConclusion ? (
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>מייצר משוב...</span>
-              </div>
-            ) : conclusion ? (
+            {conclusion ? (
               <p className="text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
             ) : (
               <p className="text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
