@@ -369,7 +369,10 @@ const Scenarios = () => {
             )}
           </div>
 
-          <Button onClick={goNext} className="w-full mt-2">
+          <div className="flex justify-center animate-bounce opacity-30 -mb-1">
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <Button onClick={goNext} className="w-full mt-1">
             {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לדילמה הבאה" : "סיום"} <ArrowLeft className="h-4 w-4 mr-2" />
           </Button>
         </DialogContent>
