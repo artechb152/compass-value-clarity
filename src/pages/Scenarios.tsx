@@ -198,9 +198,6 @@ const Scenarios = () => {
 
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
 
-  const scrollDown = () => {
-    window.scrollBy({ top: 300, behavior: "smooth" });
-  };
 
   return (
     <AppShell>
