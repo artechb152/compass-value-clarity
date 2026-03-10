@@ -61,6 +61,7 @@ const Scenarios = () => {
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [isModalAtBottom, setIsModalAtBottom] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
