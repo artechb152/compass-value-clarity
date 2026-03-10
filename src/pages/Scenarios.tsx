@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import SegmentedProgress from "@/components/SegmentedProgress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Trophy, ChevronDown } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy, ChevronDown, X } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const RUACH_VALUES = [
