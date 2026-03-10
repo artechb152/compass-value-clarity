@@ -124,28 +124,34 @@ const Scenarios = () => {
 
   const didChangeDirection = choice1 !== null && choice2 !== null && choice1 !== choice2;
 
-  const generateConclusion = async () => {
-    if (!scenario || choice1 === null || choice2 === null) return;
-    setLoadingConclusion(true);
-    try {
-      const { data } = await supabase.functions.invoke("generate-conclusion", {
-        body: {
-          title: scenario.title_he,
-          story: scenario.story_he?.substring(0, 300),
-          choice1Text: choices1[choice1],
-          choice2Text: choices2[choice2],
-          values: selectedValues,
-          scaleValues,
-          reflection,
-          changedDirection: didChangeDirection,
-        },
-      });
-      setConclusion(data?.conclusion || "");
-    } catch {
-      setConclusion("");
-    } finally {
-      setLoadingConclusion(false);
-    }
+  const generateConclusion = () => {
+    if (!scenario || choice1 === null || choice2 === null || selectedValues.length < 2) return;
+    const val1 = selectedValues[0];
+    const val2 = selectedValues[1];
+    const s1 = scaleValues[val1] ?? 5;
+    const s2 = scaleValues[val2] ?? 5;
+    const moreImpacted = s1 > s2 ? val1 : s2 > s1 ? val2 : null;
+
+    const directionLine = didChangeDirection
+      ? "אחרי שהדילמה החמירה, בחרת לשנות כיוון - מה שמעיד שהמחיר של ההחלטה הראשונה נעשה מבחינתך כבד יותר."
+      : "גם כשהמצב החמיר, נשארת באותו כיוון - מה שמעיד על עקביות בשיקול הדעת שלך.";
+
+    const impactLine = moreImpacted
+      ? `סימנת שההתנגשות המרכזית הייתה בין ${val1} לבין ${val2}, ולפי הסקלה שלך הרגשת שהפגיעה המרכזית הייתה דווקא ב${moreImpacted}.`
+      : `סימנת שההתנגשות המרכזית הייתה בין ${val1} לבין ${val2}, ולפי הסקלה שלך שניהם נפגעו באופן דומה - מה שמעיד על דילמה עמוקה במיוחד.`;
+
+    const reflectionLine = reflection.trim().length > 0
+      ? `ברפלקציה שלך עלה שהשיקול המרכזי קשור ל${reflection.trim().length > 40 ? reflection.trim().substring(0, 40) + "..." : reflection.trim()}, וזה מחזק את ההבנה שפעלת מתוך מודעות לערכים שהתנגשו.`
+      : "";
+
+    const lines = [
+      `הבחירה שלך מראה שניסית לאזן בין ערכים שונים במצב שאין בו תשובה אחת נכונה.`,
+      directionLine,
+      impactLine,
+      reflectionLine,
+    ].filter(Boolean);
+
+    setConclusion(lines.join("\n"));
   };
 
   const handleSubmit = async () => {
