@@ -240,7 +240,7 @@ const Scenarios = () => {
 
   return (
     <AppShell>
-      <div className="p-4 max-w-2xl mx-auto">
+      <div className="p-3 sm:p-4 max-w-2xl mx-auto w-full overflow-hidden" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
