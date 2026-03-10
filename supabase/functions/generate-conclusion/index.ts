@@ -86,7 +86,9 @@ ${moreImpacted ? `הערך שנפגע יותר לפי המשתמש: ${moreImpact
     }
 
     const data = await response.json();
-    const conclusion = data.choices?.[0]?.message?.content || "";
+    let conclusion = data.choices?.[0]?.message?.content || "";
+    // Strip any thinking/reasoning markers from the response
+    conclusion = conclusion.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
 
     return new Response(JSON.stringify({ conclusion }), {
       headers: {
