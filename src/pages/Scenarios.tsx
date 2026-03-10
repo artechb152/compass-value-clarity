@@ -246,9 +246,9 @@ const Scenarios = () => {
 
             {/* Escalation */}
             {choice1 !== null && (
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
-                <p className="text-sm font-bold text-foreground mb-1">המצב מחמיר</p>
-                <p className="text-sm">{escalationText}</p>
+              <div className="bg-amber-50 border border-amber-300 rounded-lg p-3">
+                <p className="text-sm font-bold text-amber-800 mb-1">⚠️ המצב מחמיר</p>
+                <p className="text-sm text-amber-900">{escalationText}</p>
               </div>
             )}
 
