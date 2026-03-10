@@ -355,9 +355,8 @@ const Scenarios = () => {
           </CardContent>
         </Card>
 
-        {/* Scroll indicator */}
         {!isAtBottom && (
-          <div className="flex justify-center pb-4 opacity-60">
+          <div className="fixed bottom-4 left-1/2 z-20 flex -translate-x-1/2 justify-center opacity-60 pointer-events-none">
             <ChevronDown className="h-5 w-5 text-primary" />
           </div>
         )}
