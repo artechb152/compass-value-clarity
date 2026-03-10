@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Trophy } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy, ChevronDown } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const RUACH_VALUES = [
@@ -246,9 +246,9 @@ const Scenarios = () => {
 
             {/* Escalation */}
             {choice1 !== null && (
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3">
-                <p className="text-sm font-bold text-foreground mb-1">המצב מחמיר</p>
-                <p className="text-sm">{escalationText}</p>
+              <div className="bg-amber-50 border border-amber-300 rounded-lg p-3">
+                <p className="text-sm font-bold text-amber-800 mb-1">⚠️ המצב מחמיר</p>
+                <p className="text-sm text-amber-900">{escalationText}</p>
               </div>
             )}
 
@@ -321,20 +321,25 @@ const Scenarios = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Subtle scroll indicator */}
+        <div className="flex justify-center pb-4 animate-bounce opacity-30">
+          <ChevronDown className="h-5 w-5 text-muted-foreground" />
+        </div>
       </div>
 
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide p-4 sm:p-6" dir="rtl">
           <DialogHeader className="text-right">
             <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
           </DialogHeader>
 
           {/* Part 1 - Choice Summary */}
-          <div className="space-y-2 text-sm text-right">
-            <p className="font-bold text-foreground mb-2">סיכום הבחירות שלך</p>
+          <div className="space-y-1.5 text-xs sm:text-sm text-right">
+            <p className="font-bold text-foreground mb-2 text-sm">סיכום הבחירות שלך</p>
             <p>• הבחירה הראשונה שלך הייתה: <strong>{choice1 !== null ? choices1[choice1] : ""}</strong></p>
             <p>• אחרי ההחמרה בחרת: <strong>{choice2 !== null ? choices2[choice2] : ""}</strong></p>
             <p>• {didChangeDirection ? "שינית כיוון אחרי ההחמרה" : "נשארת באותו כיוון גם אחרי ההחמרה"}</p>
@@ -346,12 +351,12 @@ const Scenarios = () => {
           </div>
 
           {/* Part 2 - Personalized Feedback */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
-            <p className="font-bold text-foreground text-sm mb-2">משוב מותאם אישית</p>
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-2">
+            <p className="font-bold text-foreground text-xs sm:text-sm mb-2">משוב מותאם אישית</p>
             {conclusion ? (
-              <p className="text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
+              <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
             )}
           </div>
 
