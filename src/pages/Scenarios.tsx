@@ -405,7 +405,7 @@ const Scenarios = () => {
 
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide text-center" dir="rtl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
           <div className="flex flex-col items-end gap-1">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
@@ -418,7 +418,7 @@ const Scenarios = () => {
             </DialogHeader>
           </div>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
-          <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full" size="lg">
+          <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full text-right" size="lg">
             חזרה למסך הבית
           </Button>
         </DialogContent>
