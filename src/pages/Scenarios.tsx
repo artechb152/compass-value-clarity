@@ -359,7 +359,7 @@ const Scenarios = () => {
           const el = e.currentTarget;
           setIsModalAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 30);
         }}>
-          <div className="flex justify-end w-full">
+          <div className="w-full text-right">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
             </DialogClose>
@@ -406,7 +406,7 @@ const Scenarios = () => {
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
-          <div className="flex justify-end w-full">
+          <div className="w-full text-right">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
             </DialogClose>
