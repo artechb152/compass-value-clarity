@@ -76,6 +76,17 @@ const Scenarios = () => {
   }, []);
 
   useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 40);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [scenario, currentIdx, choice1, choice2, selectedValues.length, reflection]);
+
+  useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
     if (user) {
       supabase.from("progress").upsert({ user_id: user.id, module_key: "scenarios", status: "in_progress", updated_at: new Date().toISOString() }, { onConflict: "user_id,module_key" });
