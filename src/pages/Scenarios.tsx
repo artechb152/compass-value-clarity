@@ -60,19 +60,6 @@ const Scenarios = () => {
   const [scaleValues, setScaleValues] = useState<Record<string, number>>({});
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
-  const [isAtBottom, setIsAtBottom] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight;
-      setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 40);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
