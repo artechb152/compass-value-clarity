@@ -418,7 +418,7 @@ const Scenarios = () => {
             </DialogHeader>
           </div>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
-          <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full" size="lg">
+          <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full text-right" size="lg">
             חזרה למסך הבית
           </Button>
         </DialogContent>
