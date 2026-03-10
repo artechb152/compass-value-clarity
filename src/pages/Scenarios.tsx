@@ -331,7 +331,7 @@ const Scenarios = () => {
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide p-4 sm:p-6" dir="rtl">
           <DialogHeader className="text-right">
             <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
             <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
