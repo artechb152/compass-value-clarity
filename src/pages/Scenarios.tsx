@@ -344,16 +344,6 @@ const Scenarios = () => {
         </Card>
       </div>
 
-      {/* Scroll down indicator */}
-      {showScrollArrow && (
-        <button
-          onClick={scrollDown}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-primary-foreground rounded-full p-2 shadow-lg animate-bounce"
-          aria-label="גלול למטה"
-        >
-          <ArrowDown className="h-5 w-5" />
-        </button>
-      )}
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
