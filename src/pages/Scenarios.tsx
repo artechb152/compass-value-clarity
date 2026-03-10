@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, ArrowDown, Trophy, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trophy, Loader2 } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 const RUACH_VALUES = [
@@ -62,30 +62,6 @@ const Scenarios = () => {
   const [conclusion, setConclusion] = useState("");
   const [loadingConclusion, setLoadingConclusion] = useState(false);
 
-  // Scroll indicator
-  const [showScrollArrow, setShowScrollArrow] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const checkScroll = useCallback(() => {
-    requestAnimationFrame(() => {
-      const scrollBottom = window.innerHeight + window.scrollY;
-      const docHeight = document.documentElement.scrollHeight;
-      setShowScrollArrow(docHeight - scrollBottom > 80);
-    });
-  }, []);
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
-    const observer = new MutationObserver(checkScroll);
-    if (contentRef.current) observer.observe(contentRef.current, { childList: true, subtree: true });
-    return () => {
-      window.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-      observer.disconnect();
-    };
-  }, [checkScroll]);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
@@ -222,13 +198,10 @@ const Scenarios = () => {
 
   const completedCount = scenarios.filter(s => completedIds.has(s.id)).length;
 
-  const scrollDown = () => {
-    window.scrollBy({ top: 300, behavior: "smooth" });
-  };
 
   return (
     <AppShell>
-      <div className="p-4 max-w-2xl mx-auto" ref={contentRef}>
+      <div className="p-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
@@ -344,16 +317,6 @@ const Scenarios = () => {
         </Card>
       </div>
 
-      {/* Scroll down indicator */}
-      {showScrollArrow && (
-        <button
-          onClick={scrollDown}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-primary-foreground rounded-full p-2 shadow-lg animate-bounce"
-          aria-label="גלול למטה"
-        >
-          <ArrowDown className="h-5 w-5" />
-        </button>
-      )}
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
