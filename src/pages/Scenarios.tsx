@@ -338,8 +338,8 @@ const Scenarios = () => {
           </DialogHeader>
 
           {/* Part 1 - Choice Summary */}
-          <div className="space-y-2 text-sm text-right">
-            <p className="font-bold text-foreground mb-2">סיכום הבחירות שלך</p>
+          <div className="space-y-1.5 text-xs sm:text-sm text-right">
+            <p className="font-bold text-foreground mb-2 text-sm">סיכום הבחירות שלך</p>
             <p>• הבחירה הראשונה שלך הייתה: <strong>{choice1 !== null ? choices1[choice1] : ""}</strong></p>
             <p>• אחרי ההחמרה בחרת: <strong>{choice2 !== null ? choices2[choice2] : ""}</strong></p>
             <p>• {didChangeDirection ? "שינית כיוון אחרי ההחמרה" : "נשארת באותו כיוון גם אחרי ההחמרה"}</p>
