@@ -240,7 +240,7 @@ const Scenarios = () => {
 
   return (
     <AppShell>
-      <div className="p-4 max-w-2xl mx-auto">
+      <div className="p-3 sm:p-4 max-w-2xl mx-auto w-full overflow-hidden" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 hover:bg-primary hover:text-primary-foreground">
             <ArrowRight className="h-5 w-5" />
@@ -259,7 +259,7 @@ const Scenarios = () => {
           <span className="text-xs text-muted-foreground whitespace-nowrap">{completedCount}/{SCENARIOS_PER_USER}</span>
         </div>
 
-        <Card className="mb-4 max-w-lg mx-auto">
+        <Card className="mb-4 w-full">
           <CardHeader className="p-3 sm:p-6">
             <CardTitle className="text-base sm:text-lg leading-snug">{scenario.title_he}</CardTitle>
           </CardHeader>
@@ -305,7 +305,7 @@ const Scenarios = () => {
                   {RUACH_VALUES.map((v) => (
                     <button
                       key={v}
-                      className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15"}`}
+                      className={`cursor-pointer px-2.5 py-1.5 text-[11px] sm:text-xs font-medium rounded-lg border transition-colors ${selectedValues.includes(v) ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground border-input hover:bg-primary/15"}`}
                       onClick={() => toggleValue(v)}
                     >
                       {v}
