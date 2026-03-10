@@ -365,7 +365,7 @@ const Scenarios = () => {
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide p-4 sm:p-6" dir="rtl" onScroll={(e) => {
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden scrollbar-hide p-3 sm:p-6" dir="rtl" onScroll={(e) => {
           const el = e.currentTarget;
           setIsModalAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 30);
         }}>
