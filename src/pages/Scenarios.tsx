@@ -84,7 +84,7 @@ const Scenarios = () => {
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [scenario, currentIdx, choice1, choice2, selectedValues.length, reflection]);
+  }, [allScenarios.length, currentIdx, choice1, choice2, selectedValues.length, reflection, showSummaryModal]);
 
   useEffect(() => {
     supabase.from("scenarios").select("*").then(({ data }) => data && setAllScenarios(data));
