@@ -406,17 +406,17 @@ const Scenarios = () => {
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide" dir="rtl">
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex justify-end w-full">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
             </DialogClose>
-            <DialogHeader className="text-right w-full">
-              <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
-              <DialogDescription className="text-base mt-2 text-right">
-                סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
-              </DialogDescription>
-            </DialogHeader>
           </div>
+          <DialogHeader className="text-right w-full">
+            <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
+            <DialogDescription className="text-base mt-2 text-right">
+              סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
+            </DialogDescription>
+          </DialogHeader>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
           <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full text-right" size="lg">
             חזרה למסך הבית
