@@ -61,6 +61,7 @@ const Scenarios = () => {
   const [reflection, setReflection] = useState("");
   const [conclusion, setConclusion] = useState("");
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [isModalAtBottom, setIsModalAtBottom] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -194,6 +195,7 @@ const Scenarios = () => {
       return newCompleted;
     });
     setShowSummaryModal(true);
+    setIsModalAtBottom(false);
     toast.success("התשובה נשמרה!");
     generateConclusion();
   };
@@ -353,14 +355,19 @@ const Scenarios = () => {
 
       {/* Summary Modal */}
       <Dialog open={showSummaryModal} onOpenChange={(open) => { setShowSummaryModal(open); if (!open) resetState(); }}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide p-4 sm:p-6" dir="rtl">
-          <DialogHeader className="text-right flex flex-row items-center justify-between">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg max-h-[85vh] overflow-y-auto scrollbar-hide p-4 sm:p-6" dir="rtl" onScroll={(e) => {
+          const el = e.currentTarget;
+          setIsModalAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 30);
+        }}>
+          <div className="flex flex-col items-end gap-1">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
             </DialogClose>
-            <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
-            <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
-          </DialogHeader>
+            <DialogHeader className="text-right w-full">
+              <DialogTitle className="text-lg text-right">הסיכום שלך</DialogTitle>
+              <DialogDescription className="sr-only">סיכום הדילמה</DialogDescription>
+            </DialogHeader>
+          </div>
 
           {/* Part 1 - Choice Summary */}
           <div className="space-y-1.5 text-xs sm:text-sm text-right">
@@ -385,9 +392,11 @@ const Scenarios = () => {
             )}
           </div>
 
-          <div className="flex justify-center opacity-60 -mb-1">
-            <ChevronDown className="h-4 w-4 text-primary" />
-          </div>
+          {!isModalAtBottom && (
+            <div className="flex justify-center opacity-60 -mb-1">
+              <ChevronDown className="h-4 w-4 text-primary" />
+            </div>
+          )}
           <Button onClick={goNext} className="w-full mt-1">
             {currentIdx !== null && currentIdx < scenarios.length - 1 ? "ממשיכים לדילמה הבאה" : "סיום"} <ArrowLeft className="h-4 w-4 mr-2" />
           </Button>
@@ -397,15 +406,17 @@ const Scenarios = () => {
       {/* Completion Dialog */}
       <Dialog open={showCompletionDialog} onOpenChange={(open) => { setShowCompletionDialog(open); if (!open) navigate("/"); }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide text-center" dir="rtl">
-          <DialogHeader className="flex flex-row items-center justify-between">
+          <div className="flex flex-col items-end gap-1">
             <DialogClose className="p-1.5 rounded-md text-foreground/50 hover:bg-primary hover:text-white transition-all">
               <X className="h-4 w-4" />
             </DialogClose>
-            <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
-            <DialogDescription className="text-base mt-2 text-right">
-              סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
-            </DialogDescription>
-          </DialogHeader>
+            <DialogHeader className="text-right w-full">
+              <DialogTitle className="text-2xl text-right">כל הכבוד!</DialogTitle>
+              <DialogDescription className="text-base mt-2 text-right">
+                סיימת את כל הדילמות בהצלחה. עכשיו המשך לדילמת השבוע.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
           <Trophy className="h-16 w-16 text-primary mx-auto my-4" />
           <Button onClick={() => { setShowCompletionDialog(false); navigate("/"); }} className="w-full" size="lg">
             חזרה למסך הבית
