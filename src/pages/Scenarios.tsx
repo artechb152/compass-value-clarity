@@ -351,12 +351,12 @@ const Scenarios = () => {
           </div>
 
           {/* Part 2 - Personalized Feedback */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-3">
-            <p className="font-bold text-foreground text-sm mb-2">משוב מותאם אישית</p>
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-2">
+            <p className="font-bold text-foreground text-xs sm:text-sm mb-2">משוב מותאם אישית</p>
             {conclusion ? (
-              <p className="text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
+              <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-line">{conclusion}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">לא הצלחנו לייצר משוב, אפשר להמשיך לדילמה הבאה.</p>
             )}
           </div>
 
