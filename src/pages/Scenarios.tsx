@@ -198,7 +198,7 @@ const Scenarios = () => {
     setScaleValues({});
     setReflection("");
     setConclusion("");
-    setLoadingConclusion(false);
+    
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
