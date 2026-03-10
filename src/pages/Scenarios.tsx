@@ -342,10 +342,12 @@ const Scenarios = () => {
           </CardContent>
         </Card>
 
-        {/* Subtle scroll indicator */}
-        <div className="flex justify-center pb-4 animate-bounce opacity-30">
-          <ChevronDown className="h-5 w-5 text-muted-foreground" />
-        </div>
+        {/* Scroll indicator - hidden when at bottom */}
+        {!isAtBottom && (
+          <div className="flex justify-center pb-4 opacity-60">
+            <ChevronDown className="h-5 w-5 text-primary" />
+          </div>
+        )}
       </div>
 
 
