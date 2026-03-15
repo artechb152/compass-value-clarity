@@ -326,7 +326,7 @@ const Orders = () => {
           setFeedbackModal(null);
         }
       }}>
-        <DialogContent className={`max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide border-2 border-destructive ${!feedbackIsCorrect ? "[&>button:last-child]:hidden" : ""}`} dir="rtl" role="dialog" aria-modal="true">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto scrollbar-hide border-2 border-destructive" dir="rtl" role="dialog" aria-modal="true">
           {feedbackModal && (
             <>
               <DialogHeader className="text-right">
