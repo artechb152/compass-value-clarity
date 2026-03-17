@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight, Trophy } from "lucide-react";
-import userLogo from "@/assets/user-logo.png";
 
 const modules = [
   { key: "values", title: "רוח צה״ל - הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
