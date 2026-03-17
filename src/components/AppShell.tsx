@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "next-themes";
 import ruachWhiteLogo from "@/assets/ruach-tzahal-white.png";
+import userLogo from "@/assets/user-logo.png";
 
 const navItems = [
   { to: "/", icon: Home, label: "מסלול" },
