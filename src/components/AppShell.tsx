@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { useTheme } from "next-themes";
 import ruachWhiteLogo from "@/assets/ruach-tzahal-white.png";
+import userLogo from "@/assets/user-logo.png";
 
 const navItems = [
   { to: "/", icon: Home, label: "מסלול" },
@@ -34,6 +35,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </Tooltip>
         </TooltipProvider>
         <div className="flex items-center gap-1">
+          <img src={userLogo} alt="לוגו" className="h-8 w-auto" />
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import SegmentedProgress from "@/components/SegmentedProgress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BookOpen, Shield, FlaskConical, MessageCircleQuestion, ArrowRight, Trophy } from "lucide-react";
-import userLogo from "@/assets/user-logo.png";
 
 const modules = [
   { key: "values", title: "רוח צה״ל - הערכים", icon: BookOpen, to: "/values", description: "11 ערכי יסוד של רוח צה״ל", total: 11 },
@@ -89,10 +88,7 @@ const Home = () => {
     <AppShell>
       <div className="p-4 max-w-2xl mx-auto space-y-6">
         <div className="text-center py-6 relative">
-          <div className="flex items-center justify-center gap-3">
-            <h1 className="text-4xl font-bold text-primary">רוח צה״ל</h1>
-            <img src={userLogo} alt="לוגו" className="h-12 w-auto" />
-          </div>
+          <h1 className="text-4xl font-bold text-primary mb-1">רוח צה״ל</h1>
           <p className="text-muted-foreground">התנגשות בין ערכים</p>
           <Button variant="ghost" size="icon" onClick={() => navigate("/intro")} className="absolute top-[26px] right-0 hover:bg-primary [&:hover_svg]:text-white" aria-label="חזרה למסך הפתיחה">
             <ArrowRight className="h-5 w-5 text-muted-foreground" />
