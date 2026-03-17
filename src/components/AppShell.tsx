@@ -32,7 +32,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 <button onClick={() => navigate("/")} className="transition-transform hover:scale-105" aria-label="מסך הבית">
                   <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-10 w-auto" />
                 </button>
-                <img src={userLogo} alt="לוגו" className="h-8 w-auto" />
+                <img src={userLogo} alt="לוגו" className="h-10 w-auto" />
               </div>
             </TooltipTrigger>
           </Tooltip>
