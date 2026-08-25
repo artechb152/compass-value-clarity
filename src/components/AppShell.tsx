@@ -37,7 +37,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </TooltipProvider>
         </div>
         <div className="flex items-center justify-center px-2">
-          <img src={userLogoAsset.url} alt="לוגו" className="h-10 w-auto max-w-[130px]" />
+          <img src={userLogoAsset.url} alt="לוגו" className="h-8 w-auto max-w-[130px]" />
         </div>
         <div className="flex-1 flex items-center justify-end gap-1">
           <TooltipProvider delayDuration={300}>
