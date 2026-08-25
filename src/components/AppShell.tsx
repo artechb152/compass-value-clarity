@@ -24,20 +24,22 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
   return (
     <div className="min-h-screen flex flex-col" dir="rtl">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground px-4 py-2 flex items-center justify-between sticky top-0 z-40 shadow-md">
-        <TooltipProvider delayDuration={300}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-2">
+      <header className="bg-primary text-primary-foreground px-4 py-2 flex items-center sticky top-0 z-40 shadow-md">
+        <div className="flex-1 flex items-center justify-start">
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <button onClick={() => navigate("/")} className="transition-transform hover:scale-105" aria-label="מסך הבית">
                   <img src={ruachWhiteLogo} alt="רוח צה״ל" className="h-10 w-auto" />
                 </button>
-                <img src={userLogoAsset.url} alt="לוגו" className="h-10 w-auto" />
-              </div>
-            </TooltipTrigger>
-          </Tooltip>
-        </TooltipProvider>
-        <div className="flex items-center gap-1">
+              </TooltipTrigger>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        <div className="flex items-center justify-center px-2">
+          <img src={userLogoAsset.url} alt="לוגו" className="h-10 w-auto max-w-[130px]" />
+        </div>
+        <div className="flex-1 flex items-center justify-end gap-1">
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
